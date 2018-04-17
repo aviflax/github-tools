@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Get the config from the environment and make it available.
 module Config
   REQUIRED = [
@@ -18,6 +20,6 @@ module Config
   end
 
   def self.[](name)
-    ENV[name.to_s.upcase]
+    ENV[name&.to_s&.upcase]
   end
 end
