@@ -22,4 +22,12 @@ module Config
   def self.[](name)
     ENV[name&.to_s&.upcase]
   end
+
+  # Requires that #[:token] returns a valid GitHub OAuth token, so you should probably call
+  # #validate! first.
+  def self.make_client
+    client = Octokit::Client.new access_token: self[:token]
+    client.auto_paginate = true
+    client
+  end
 end

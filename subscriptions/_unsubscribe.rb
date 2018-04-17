@@ -7,10 +7,7 @@ Config.validate!
 
 # TODO: PRINT AN ERROR ON TIMEOUT OR IF STDIN is closed or empty
 repo_names = STDIN.readlines chomp: true
-
-client = Octokit::Client.new access_token: Config[:token]
-client.auto_paginate = true
-
+client = Config.make_client
 org = Config[:org]
 
 repo_names.each do |repo_name|
