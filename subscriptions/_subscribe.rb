@@ -3,38 +3,35 @@
 require 'octokit'
 require_relative './config'
 
-Config.validate!
-
 def oh_no(msg)
   puts msg
   exit false
 end
 
-topic = ARGV[0] || ''
+def args
+  topic = ARGV[0] || ''
 
-if topic.empty?
-  oh_no 'The first arg must be either a topic or - to indicate to read a list of repos via STDIN.'
+  if topic.empty?
+    oh_no 'The first arg must be either a topic or - to indicate to read a list of repos via STDIN.'
+  end
+
+  read_from_stdin = topic == '-'
+
+  [topic, read_from_stdin]
 end
 
-read_from_stdin = topic == '-'
-retrieve_via_topic = !read_from_stdin
-repo_names_supplied = read_from_stdin ? STDIN.readlines(chomp: true) : []
-
-if read_from_stdin && repo_names_supplied.empty?
-  oh_no 'If the first arg is - you must supply a list of repos via STDIN.'
-elsif !read_from_stdin && !repo_names_supplied.empty?
-  oh_no 'If you wish to supply a list of repos via STDIN you must specify - as the first arg.'
+def repos_from_stdin
+  repo_names = STDIN.readlines chomp: true
+  oh_no 'If the first arg is - you must supply a list of repos via STDIN.' if repo_names.empty?
+  repo_names
 end
-
-client = Config.make_client
-org = Config[:org]
 
 def print_now(s)
   print s
   $stdout.flush
 end
 
-def get_repo_names(client, topic, org)
+def get_repo_names(topic, org, client)
   print_now "Retrieving list of #{org} repos with topic #{topic} ... "
   result = client.search_repos "user:#{org} topic:#{topic}"
   puts "#{result.total_count} repos found\n\n"
@@ -49,20 +46,33 @@ def get_repo_names(client, topic, org)
   result.items.map(&:name)
 end
 
-repo_names = retrieve_via_topic ? get_repo_names(client, topic, org) : repo_names_supplied
+def subscribe(repo_names, org, client)
+  puts "Subscribing to #{repo_names.length} repos:\n\n"
 
-if repo_names.empty?
-  puts 'No repos, nothing to do.'
-  exit true
+  repo_names.each do |repo_name|
+    print_now "#{repo_name} ... "
+
+    full_name = "#{org}/#{repo_name}"
+    client.update_subscription full_name, subscribed: true
+
+    print_now "👍\n"
+  end
 end
 
-puts "Subscribing to #{repo_names.length} repos:\n\n"
+def lets_do_this
+  Config.validate!
+  org = Config[:org]
+  client = Config.make_client
+  topic, read_from_stdin = args
+  
+  repo_names = read_from_stdin ? repos_from_stdin : get_repo_names(topic, org, client)
 
-repo_names.each do |repo_name|
-  print_now "#{repo_name} ... "
+  if repo_names.empty?
+    puts 'No repos, nothing to do.'
+    exit true
+  end
 
-  full_name = "#{org}/#{repo_name}"
-  client.update_subscription full_name, subscribed: true
-
-  print_now "👍\n"
+  subscribe repo_names, org, client
 end
+
+lets_do_this
