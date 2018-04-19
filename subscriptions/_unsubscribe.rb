@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 require 'octokit'
+require 'parallel'
 require_relative './config'
+
+THREADS = 6
 
 Config.validate!
 
@@ -10,13 +13,8 @@ repo_names = STDIN.readlines chomp: true
 client = Config.make_client
 org = Config[:org]
 
-repo_names.each do |repo_name|
-  print "#{repo_name} ... "
-  $stdout.flush
+progress_label = "Unsubscribing from #{repo_names.length} repos"
 
-  full_name = "#{org}/#{repo_name}"
-  client.delete_subscription full_name
-
-  puts '👍'
-  $stdout.flush
+Parallel.each(repo_names, in_threads: THREADS, progress: progress_label) do |repo_name|
+  client.delete_subscription "#{org}/#{repo_name}"
 end

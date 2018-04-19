@@ -10,7 +10,10 @@
 
 ## Obtaining a GitHub OAuth 2.0 Token
 
-TODO
+Please see [Creating a personal access token for the command line](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/).
+
+We recommend you save your personal access token in your password manager, because GitHub will not
+show you the token again after it’s been generated.
 
 ## Usage
 
@@ -18,7 +21,17 @@ In order to be explicit, all the examples below include the required environment
 TOKEN right in the shell commands. This can be annoying to work with, so users may wish to set them
 once in their shell by running `export ORG=FundingCircle` etc.
 
-### Listing the Repos to Which You’re Subscribed
+### Deleting All Your (Org) Subscriptions
+
+Run this in bash or a bash-like shell:
+
+```shell
+export ORG=FundingCircle
+export TOKEN=FOO
+./list.sh | tee repos_unsubscribed | ./unsubscribe.sh
+```
+
+### Listing the (Org) Repos to Which You’re Subscribed
 
 `list.sh` will output all the repos that belong to the specified organization to which you’re
 subscribed.
@@ -29,7 +42,7 @@ Run this in bash or a bash-like shell:
 ORG=FundingCircle TOKEN=FOO ./list.sh | tee repos
 ```
 
-### Unsubscribing From a Set of Repos
+### Unsubscribing From a Set of (Org) Repos
 
 Assuming the set of repos to which you’d like to unsubscribe is in the local file `repos`:
 
@@ -37,7 +50,7 @@ Assuming the set of repos to which you’d like to unsubscribe is in the local f
 cat repos | ORG=FundingCircle TOKEN=FOO ./unsubscribe.sh
 ```
 
-### Subscribing to a Set of Repos
+### Subscribing to a Set of (Org) Repos
 
 `subscribe.sh` will subscribe you to all the org’s repos with the specified topic.
 

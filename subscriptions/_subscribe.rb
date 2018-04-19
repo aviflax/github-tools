@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 require 'octokit'
+require 'parallel'
 require_relative './config'
+
+THREADS = 6
 
 def oh_no(msg)
   puts msg
@@ -32,8 +35,10 @@ def print_now(s)
 end
 
 def get_repo_names(topic, org, client)
-  print_now "Retrieving list of #{org} repos with topic #{topic} ... "
+  print "Retrieving list of #{org} repos with topic #{topic} ... "
+
   result = client.search_repos "user:#{org} topic:#{topic}"
+
   puts "#{result.total_count} repos found\n\n"
 
   # TODO: possible bug in this function: I don’t know whether auto_paginate works for this method.
@@ -47,15 +52,11 @@ def get_repo_names(topic, org, client)
 end
 
 def subscribe(repo_names, org, client)
-  puts "Subscribing to #{repo_names.length} repos:\n\n"
+  progress_label = "Subscribing to #{repo_names.length} repos"
 
-  repo_names.each do |repo_name|
-    print_now "#{repo_name} ... "
-
+  Parallel.each(repo_names, in_threads: THREADS, progress: progress_label) do |repo_name|
     full_name = "#{org}/#{repo_name}"
     client.update_subscription full_name, subscribed: true
-
-    print_now "👍\n"
   end
 end
 
@@ -64,7 +65,7 @@ def lets_do_this
   org = Config[:org]
   client = Config.make_client
   topic, read_from_stdin = args
-  
+
   repo_names = read_from_stdin ? repos_from_stdin : get_repo_names(topic, org, client)
 
   if repo_names.empty?
