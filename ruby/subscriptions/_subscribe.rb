@@ -57,6 +57,9 @@ def subscribe(repo_names, org, client)
   Parallel.each(repo_names, in_threads: THREADS, progress: progress_label) do |repo_name|
     full_name = "#{org}/#{repo_name}"
     client.update_subscription full_name, subscribed: true
+  rescue Octokit::TooManyRequests
+    pp client.rate_limit
+    raise
   end
 end
 

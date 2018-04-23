@@ -17,4 +17,7 @@ progress_label = "Unsubscribing from #{repo_names.length} repos"
 
 Parallel.each(repo_names, in_threads: THREADS, progress: progress_label) do |repo_name|
   client.delete_subscription "#{org}/#{repo_name}"
+rescue Octokit::TooManyRequests
+  pp client.rate_limit
+  raise
 end

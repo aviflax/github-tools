@@ -5,5 +5,10 @@ require_relative './config'
 
 Config.validate!
 client = Config.make_client
-subs = client.subscriptions.select { |repo| repo.owner.login == Config[:org] }
-puts subs.map(&:name).sort.join("\n")
+
+begin
+  subs = client.subscriptions.select { |repo| repo.owner.login == Config[:org] }
+  puts subs.map(&:name).sort.join("\n")
+rescue Octokit::TooManyRequests
+  pp client.rate_limit
+end
