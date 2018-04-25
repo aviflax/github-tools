@@ -7,7 +7,7 @@ Tools for working with GitHub in a large org with many repos.
 “Tools” is maybe an ambitious word; right now these are all “just” scripts:
 
 | Tool | Description | Input (stdin, happy path) | Output (stdout, happy path) |
-| ---- | ------------- | --------------- |
+| ---- | ----------- | ------------------------- | --------------------------- |
 | `list` | lists the org’s repos: either those with a specified topic or those to which you’re subscribed | *none* | list of repos |
 | `subscribe` | subscribes you to a set of repos | list of repos | *none* |
 | `unsubscribe` | unsubscribes you from a set of repos | list of repos | *none* |
