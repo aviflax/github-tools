@@ -117,7 +117,7 @@ Assuming the set of repos to which you’d like to unsubscribe is in the local f
 cat repos | ORG=FundingCircle TOKEN=FOO ./unsubscribe
 ```
 
-### Subscribing to a Set of (Org) Repos
+#### Subscribing to a Set of (Org) Repos
 
 Assuming the set of repos to which you’d like to subscribe is in the local file `repos`:
 
