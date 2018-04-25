@@ -48,6 +48,8 @@ The tools adhere to [the UNIX philosophy](https://en.wikipedia.org/wiki/Unix_phi
 
 Therefore you can combine many of these tools together using UNIX pipes.
 
+#### Some Examples
+
 First, you’ll want to `export` the required environment variables:
 
 ```shell
@@ -55,17 +57,21 @@ export ORG=FundingCircle
 export TOKEN=FOO
 ```
 
-For example, this would remove **all** your (org) subscriptions:
+##### First
+
+This would remove **all** your (org) subscriptions:
 
 ```shell
 ./list subs | tee repos_unsubscribed | ./unsubscribe
 ```
 
-and this would then restore those subscriptions:
+…and this would then restore those subscriptions:
 
 ```shell
 cat repos_unsubscribed | ./subscribe
 ```
+
+##### Second
 
 This would subscribe you to all repos with the topic _marketplace_:
 
@@ -73,7 +79,7 @@ This would subscribe you to all repos with the topic _marketplace_:
 ./list repos marketplace | ./subscribe
 ```
 
-And this would unsubscribe you from those repos:
+…and this would unsubscribe you from those repos:
 
 ```shell
 ./list repos marketplace | ./unsubscribe
