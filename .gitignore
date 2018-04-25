@@ -1,6 +1,4 @@
-Dockerfile
-Gemfile
-config.rb
+all_repos
 repos
 repos.bak
 repos_unsubscribed
