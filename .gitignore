@@ -1,4 +1,5 @@
-all_repos
 repos
-repos.bak
-repos_unsubscribed
+all_repos
+*_repos
+repos_*
+*.bak

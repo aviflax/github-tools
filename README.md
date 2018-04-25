@@ -62,13 +62,13 @@ export TOKEN=FOO
 This would remove **all** your (org) subscriptions:
 
 ```shell
-./list subs | tee repos_unsubscribed | ./unsubscribe
+./list subs | tee repos_subscribed.bak | ./unsubscribe
 ```
 
 …and this would then restore those subscriptions:
 
 ```shell
-cat repos_unsubscribed | ./subscribe
+cat repos_subscribed.bak | ./subscribe
 ```
 
 ##### Second
@@ -76,13 +76,13 @@ cat repos_unsubscribed | ./subscribe
 This would subscribe you to all repos with the topic _marketplace_:
 
 ```shell
-./list repos marketplace | ./subscribe
+./list repos marketplace | tee marketplace_repos | ./subscribe
 ```
 
 …and this would unsubscribe you from those repos:
 
 ```shell
-./list repos marketplace | ./unsubscribe
+cat marketplace_repos | ./unsubscribe
 ```
 
 ### Individually
