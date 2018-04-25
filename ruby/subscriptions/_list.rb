@@ -11,4 +11,5 @@ begin
   puts subs.map(&:name).sort.join("\n")
 rescue Octokit::TooManyRequests
   pp client.rate_limit
+  raise
 end
