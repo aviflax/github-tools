@@ -2,7 +2,7 @@
 
 set -e
 
-cp ../Dockerfile ../*.rb ./
+cp ../Dockerfile ../Gemfile ../*.rb ./
 
 IMAGE_ID=`docker build --quiet .`
 
