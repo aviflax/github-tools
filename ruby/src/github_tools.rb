@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'octokit'
+
 # Various functions for working with GitHub
 module GitHubTools
   def self.warn_now(s)
@@ -13,12 +15,12 @@ module GitHubTools
 
     result = client.search_repos "user:#{org} topic:#{topic}"
 
-    warn_now "#{result.total_count} repos found\n"
+    warn_now "#{result.items.length} repos found\n"
 
     # TODO: possible bug in this function: I don’t know whether auto_paginate works for this method.
     # So if there’s more than 100 repos with the given topic this might return only the first 100.
     # This is an edge case so I’m OK with this for now.
-    if result.total_count == 100
+    if result.total_count > 100 && result.items.length == 100
       warn "Warning! There may be additional matching repos that weren’t retrieved!\n"
     end
 
