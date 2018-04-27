@@ -4,4 +4,4 @@ ENV TOKEN=""
 WORKDIR work
 COPY Gemfile ./
 RUN bundle install
-COPY scripts src ./
+COPY . ./
