@@ -29,13 +29,7 @@ Given 'an initialized client is supplied' do
 end
 
 When('I attempt to retrieve matching Repositories') do
-  stderr_bak = $stderr
-  $stderr = StringIO.new
-
-  @result = GitHubTools.org_repos @topic, @org, @client
-
-  @stderr = $stderr
-  $stderr = stderr_bak
+  capture_stderr { @result = GitHubTools.org_repos @topic, @org, @client }
 end
 
 Then('the result should be all of the org’s repositories') do
@@ -79,5 +73,5 @@ Then('the result should be those one hundred repositories') do
 end
 
 Then('a warning message should have been printed to stderr') do
-  expect(@stderr.string).to include('additional matching repos')
+  expect(@stderr_output).to include('additional matching repos')
 end

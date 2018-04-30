@@ -15,3 +15,18 @@ After do
 ensure
   mocha_teardown
 end
+
+module Mocha
+  # Extend existing module (that we’re using as our Cucumber “world”) to capture output to $stderr
+  # in @stderr_output. RSpec has a feature for this (#output) but it’d be very awkward to use with
+  # Cucumber.
+  module API
+    def capture_stderr
+      stderr_bak = $stderr
+      $stderr = StringIO.new
+      yield
+      @stderr_output = $stderr.string
+      $stderr = stderr_bak
+    end
+  end
+end
