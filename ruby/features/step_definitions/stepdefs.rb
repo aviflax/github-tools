@@ -29,7 +29,13 @@ Given 'an initialized client is supplied' do
 end
 
 When('I attempt to retrieve matching Repositories') do
+  stderr_bak = $stderr
+  $stderr = StringIO.new
+
   @result = GitHubTools.org_repos @topic, @org, @client
+
+  @stderr = $stderr
+  $stderr = stderr_bak
 end
 
 Then('the result should be all of the org’s repositories') do
@@ -61,14 +67,17 @@ Then('the result should be those of the org’s repositories with that topic') d
   expect(@result).to eq(@dinobot_repos)
 end
 
-Given 'the client returns exactly one hundred repositories' do
-  pending # Write code here that turns the phrase above into concrete actions
+Given 'the client returns exactly 100 repositories with total_count > 100' do
+  @repos = @all_repos[0..4] * 20
+  # Gotta change the search_repos stub to return this new value of @repos and a total_count > 100
+  @search_result = OpenStruct.new items: @repos, total_count: 101
+  @client.stubs(:search_repos).returns @search_result
 end
 
 Then('the result should be those one hundred repositories') do
-  pending # Write code here that turns the phrase above into concrete actions
+  expect(@result.length).to eq(100)
 end
 
-Then('a warning message should be printed to stderr') do
-  pending # Write code here that turns the phrase above into concrete actions
+Then('a warning message should have been printed to stderr') do
+  expect(@stderr.string).to include('additional matching repos')
 end

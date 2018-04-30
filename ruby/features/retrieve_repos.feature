@@ -46,11 +46,11 @@ Feature: Retrieve Repositories
     When I attempt to retrieve matching Repositories
     Then a TooManyRequests exception should be raised
 
-  Scenario: Topic specified, happy path, one hundred results found
+  Scenario: Topic specified, happy path, 100 results found
     Given a valid topic is specified
     And a valid org is specified
     And an initialized client is supplied
-    And the client returns exactly one hundred repositories
+    And the client returns exactly 100 repositories with total_count > 100
     When I attempt to retrieve matching Repositories
     Then the result should be those one hundred repositories
-    And a warning message should be printed to stderr
+    And a warning message should have been printed to stderr
