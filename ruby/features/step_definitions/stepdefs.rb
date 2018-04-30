@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'github_tools'
+require 'octokit'
 
 Before do
   @all_repos = [{ name: 'Optimus Prime', topics: ['prime'] },
@@ -29,7 +30,7 @@ Given 'an initialized client is supplied' do
 end
 
 When('I attempt to retrieve matching Repositories') do
-  @result = capture_stderr { GitHubTools.org_repos @topic, @org, @client }
+  @result, @stdout, @stderr = capture { GitHubTools.org_repos @topic, @org, @client }
 end
 
 Then('the result should be all of the org’s repositories') do
@@ -37,19 +38,24 @@ Then('the result should be all of the org’s repositories') do
 end
 
 Given 'that the GitHub API is unreachable' do
-  pending # Write code here that turns the phrase above into concrete actions
+  @client = mock # shorter and sweeter than calling #unstub twice
+  @client.stubs(:org_repos).raises(IOError, 'Could not connect')
+  @client.stubs(:search_repos).raises(IOError, 'Could not connect')
 end
 
 Then('an exception should be raised') do
-  pending # Write code here that turns the phrase above into concrete actions
+  expect(@result).to be_a IOError
 end
 
 Given 'that the user has hit the GitHub API’s rate limits' do
-  pending # Write code here that turns the phrase above into concrete actions
+  @client = mock # shorter and sweeter than calling #unstub twice
+  @client.stubs(:org_repos).raises(Octokit::TooManyRequests)
+  @client.stubs(:search_repos).raises(Octokit::TooManyRequests)
+  @client.stubs(:rate_limit).returns(oh_no: 'you’re done here')
 end
 
 Then('a TooManyRequests exception should be raised') do
-  pending # Write code here that turns the phrase above into concrete actions
+  expect(@result).to be_a Octokit::TooManyRequests
 end
 
 Given 'a valid topic is specified' do
@@ -73,5 +79,5 @@ Then('the result should be those one hundred repositories') do
 end
 
 Then('a warning message should have been printed to stderr') do
-  expect(@stderr_output).to include('additional matching repos')
+  expect(@stderr).to include 'additional matching repos'
 end

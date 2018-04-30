@@ -13,7 +13,7 @@ Feature: Retrieve Repositories
     And an initialized client is supplied
     And that the GitHub API is unreachable
     When I attempt to retrieve matching Repositories
-    Then an exception should be raised
+    Then an exception should have been raised
 
   Scenario: No topic specified, rate limit hit
     Given no topic is specified
@@ -21,7 +21,7 @@ Feature: Retrieve Repositories
     And an initialized client is supplied
     And that the user has hit the GitHub API’s rate limits
     When I attempt to retrieve matching Repositories
-    Then a TooManyRequests exception should be raised
+    Then a TooManyRequests exception should have been raised
 
   Scenario: Topic specified, happy path
     Given a valid topic is specified
@@ -36,7 +36,7 @@ Feature: Retrieve Repositories
     And an initialized client is supplied
     And that the GitHub API is unreachable
     When I attempt to retrieve matching Repositories
-    Then an exception should be raised
+    Then an exception should have been raised
   
   Scenario: Topic specified, rate limit hit
     Given a valid topic is specified
@@ -44,7 +44,7 @@ Feature: Retrieve Repositories
     And an initialized client is supplied
     And that the user has hit the GitHub API’s rate limits
     When I attempt to retrieve matching Repositories
-    Then a TooManyRequests exception should be raised
+    Then a TooManyRequests exception should have been raised
 
   Scenario: Topic specified, happy path, 100 results found
     Given a valid topic is specified

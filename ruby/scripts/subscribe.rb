@@ -21,5 +21,7 @@ end
 progress_label = "Subscribing to #{repo_names.length} repos"
 
 Parallel.each(repo_names, in_threads: THREADS, progress: progress_label) do |repo_name|
-  GitHubTools.handle_errs { client.update_subscription "#{org}/#{repo_name}", subscribed: true }
+  GitHubTools.handle_errs(client) do
+    client.update_subscription "#{org}/#{repo_name}", subscribed: true
+  end
 end

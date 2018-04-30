@@ -17,17 +17,29 @@ ensure
 end
 
 module Mocha
-  # Extend existing module (that we’re using as our Cucumber “world”) to capture output to $stderr
-  # in @stderr_output. RSpec has a feature for this (#output) but it’d be very awkward to use with
-  # Cucumber.
+  # Extend existing module (that we’re using as our Cucumber “world”) to return a block result
+  # or any raised exception, and also capture and return any output to stdout and stderr.
   module API
-    def capture_stderr
+    # rubocop:disable Metrics/MethodLength
+    def capture
+      stdout_bak = $stdout
       stderr_bak = $stderr
+      $stdout = StringIO.new
       $stderr = StringIO.new
-      result = yield
-      @stderr_output = $stderr.string
+
+      result = begin
+        yield
+      rescue StandardError => err
+        err
+      end
+
+      stdout = $stdout.string
+      stderr = $stderr.string
+      $stdout = stdout_bak
       $stderr = stderr_bak
-      result
+
+      [result, stdout, stderr]
     end
+    # rubocop:enable Metrics/MethodLength
   end
 end

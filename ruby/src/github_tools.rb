@@ -27,7 +27,7 @@ module GitHubTools
     result.items
   end
 
-  def self.handle_errs
+  def self.handle_errs(client)
     yield
   rescue Octokit::TooManyRequests
     pp client.rate_limit
@@ -35,7 +35,7 @@ module GitHubTools
   end
 
   def self.org_repos(topic, org, client)
-    handle_errs do
+    handle_errs(client) do
       if topic.nil? || topic.empty?
         client.org_repos org
       else
