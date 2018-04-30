@@ -24,9 +24,10 @@ module Mocha
     def capture_stderr
       stderr_bak = $stderr
       $stderr = StringIO.new
-      yield
+      result = yield
       @stderr_output = $stderr.string
       $stderr = stderr_bak
+      result
     end
   end
 end

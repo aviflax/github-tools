@@ -29,7 +29,7 @@ Given 'an initialized client is supplied' do
 end
 
 When('I attempt to retrieve matching Repositories') do
-  capture_stderr { @result = GitHubTools.org_repos @topic, @org, @client }
+  @result = capture_stderr { GitHubTools.org_repos @topic, @org, @client }
 end
 
 Then('the result should be all of the org’s repositories') do
