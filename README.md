@@ -41,7 +41,8 @@ once in their shell by running `export ORG=FundingCircle` etc.
 
 ### In Combination
 
-The tools adhere to [the UNIX philosophy](https://en.wikipedia.org/wiki/Unix_philosophy#Doug_McIlroy_on_Unix_programming) as articulated by [Doug McIlroy](https://en.wikipedia.org/wiki/Douglas_McIlroy):
+The tools adhere to [the UNIX philosophy](https://en.wikipedia.org/wiki/Unix_philosophy#Doug_McIlroy_on_Unix_programming)
+as articulated by [Doug McIlroy](https://en.wikipedia.org/wiki/Douglas_McIlroy):
 
 > Write programs that do one thing and do it well. Write programs to work together. Write programs
 > to handle text streams, because that is a universal interface.
@@ -76,7 +77,7 @@ cat repos_subscribed.bak | ./subscribe
 This would subscribe you to all repos with the topic _marketplace_:
 
 ```shell
-./list repos marketplace | tee marketplace_repos | ./subscribe
+./list repos --topic marketplace | tee marketplace_repos | ./subscribe
 ```
 
 …and this would unsubscribe you from those repos:
@@ -89,13 +90,13 @@ cat marketplace_repos | ./unsubscribe
 
 #### List the (Org) Repos that have a Certain Topic
 
-`list repos <topic>` will output all the repos that belong to the specified organization that have the specified topic.
+`list repos --topic <topic>` will output all the repos that belong to the specified organization that have the specified topic.
 
 ([Topics](https://help.github.com/articles/about-topics/) are equivalent to tags or labels; same
 idea, different name.)
 
 ```shell
-ORG=FundingCircle TOKEN=FOO ./list repos <topic> | tee repos
+ORG=FundingCircle TOKEN=FOO ./list repos --topic <topic> | tee repos
 ```
 
 #### List All of the (Org) Repos
