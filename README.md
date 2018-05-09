@@ -8,7 +8,7 @@ Tools for working with GitHub in a large org with many repos.
 
 | Tool | Description | Input (stdin, happy path) | Output (stdout, happy path) |
 | ---- | ----------- | ------------------------- | --------------------------- |
-| `list` | lists the org’s repos: either those with a specified topic or those to which you’re subscribed | *none* | list of repos |
+| `list` | lists the org’s repos: (all, by topic, or those to which you’re subscribed) | *none* | list of repos |
 | `subscribe` | subscribes you to a set of repos | list of repos | *none* |
 | `unsubscribe` | unsubscribes you from a set of repos | list of repos | *none* |
 
@@ -63,7 +63,7 @@ export TOKEN=FOO
 This would remove **all** your (org) subscriptions:
 
 ```shell
-./list subs | tee repos_subscribed.bak | ./unsubscribe
+./list repos --subscribed | tee repos_subscribed.bak | ./unsubscribe
 ```
 
 …and this would then restore those subscriptions:
@@ -101,19 +101,19 @@ ORG=FundingCircle TOKEN=FOO ./list repos --topic <topic> | tee repos
 
 #### List All of the (Org) Repos
 
-`list repos` will output all the repos that belong to the specified organization:
+`list repos --all` will output all the repos that belong to the specified organization:
 
 ```shell
-ORG=FundingCircle TOKEN=FOO ./list repos
+ORG=FundingCircle TOKEN=FOO ./list repos --all
 ```
 
-#### Listing the (Org) Repos to Which You’re Subscribed
+#### List the (Org) Repos to Which You’re Subscribed
 
 `list subs` will output all the repos that belong to the specified organization to which you’re
 subscribed:
 
 ```shell
-ORG=FundingCircle TOKEN=FOO list subs | tee repos
+ORG=FundingCircle TOKEN=FOO list repos --subscribed | tee repos
 ```
 
 #### Unsubscribing From a Set of (Org) Repos

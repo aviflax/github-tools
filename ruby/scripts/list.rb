@@ -7,20 +7,25 @@ require 'octokit'
 Config.validate!
 client = Config.make_client
 
-kind = ARGV[0]&.to_sym   # what kind of thing to list (repos or subs)
-first_flag = ARGV[1]     # should be either nil, blank, or `--topic`
-topic = ARGV[2]          # optional, applies only to repos, only if first_flag is --topic
+kind = ARGV[0]         # Kind of thing to list. Must be 'repos' (for now)
+first_flag = ARGV[1]   # Must be --all | --subscribed | --topic
+topic = ARGV[2]        # Required if first_flag is --topic; otherwise should be nil/blank
 
-kinds = {
-  subs: -> { client.subscriptions.select { |repo| repo.owner.login == Config[:org] } },
-  repos: -> { GitHubTools.org_repos topic, Config[:org], client }
-}
+usage = 'usage: list repos --all | list repos --subscribed | list repos --topic <topic>'
 
-if !kinds.keys.include?(kind) ||
-   (!first_flag.nil? && !first_flag.empty? && first_flag != '--topic') ||
-   (first_flag == '--topic' && (topic.nil? || topic.empty?))
-  abort 'usage: list subs | list repos | list repos --topic <topic>'
+if kind != 'repos' || first_flag.nil? || !first_flag.start_with?('--') ||
+   (first_flag == '--topic' && (topic.nil? || topic.empty?)) ||
+   (first_flag != '--topic' && !(topic.nil? || topic.empty?))
+  abort usage
 end
 
-repos = kinds[kind].call
+repos = case first_flag
+        when '--subscribed'
+          client.subscriptions.select { |repo| repo.owner.login == Config[:org] }
+        when '--all', '--topic'
+          GitHubTools.org_repos topic, Config[:org], client
+        else
+          abort usage
+        end
+
 puts repos.map(&:name).sort
