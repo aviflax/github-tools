@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
+# If you change this, make sure to keep this line in sync with the WORKDIR and COPY instructions in
+# the Dockerfile, and with the directory structure (i.e. the source code is currently in ./src,
+# relative to the Docker build context).
 $LOAD_PATH.unshift '/work/src'
 
 require 'mocha/api'
 
-World(Mocha::API)
+World Mocha::API
 
-Before do
-  mocha_setup
-end
+Before { mocha_setup }
 
 After do
   mocha_verify

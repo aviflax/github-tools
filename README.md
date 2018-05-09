@@ -131,3 +131,12 @@ Assuming the set of repos to which you’d like to subscribe is in the local fil
 ```shell
 cat repos | ORG=FundingCircle TOKEN=FOO ./subscribe
 ```
+
+## Working on the Tools
+
+### Running the Tests
+
+```shell
+cd ruby
+docker run -t --rm `docker build -q .` cucumber
+```

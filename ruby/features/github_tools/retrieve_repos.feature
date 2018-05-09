@@ -1,4 +1,4 @@
-Feature: Retrieve Repositories
+Feature: Retrieve Repositories from the GitHub API
 
   Scenario: No topic specified, happy path
     Given no topic is specified
@@ -46,7 +46,7 @@ Feature: Retrieve Repositories
     When I attempt to retrieve matching Repositories
     Then a TooManyRequests exception should have been raised
 
-  Scenario: Topic specified, happy path, 100 results found
+  Scenario: Topic specified, happy path, 100 results returned but >100 found
     Given a valid topic is specified
     And a valid org is specified
     And an initialized client is supplied
