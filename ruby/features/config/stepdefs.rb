@@ -2,6 +2,11 @@
 
 require 'config'
 
+Given 'the environment does not contain ORG nor TOKEN' do
+  ENV.delete 'ORG'
+  ENV.delete 'TOKEN'
+end
+
 Given 'the environment DOES contain the variable UNDERWEAR_TYPE with the value boxers' do
   ENV['UNDERWEAR_TYPE'] = 'boxers'
 end
@@ -26,28 +31,34 @@ Then 'the result should be nil' do
   expect(@result).to eq nil
 end
 
-Given 'all the required environment variables exist' do
+Given 'all the required environment variables exist with INvalid values' do
   ENV['ORG'] = ''
   ENV['TOKEN'] = ''
 end
 
-Given 'all the required environment variables have valid values' do
+Given 'all the required environment variables exist with VALID values' do
   ENV['ORG'] = 'The Rebellion'
   ENV['TOKEN'] = 'R2D2+C3P0'
 end
 
 When 'validate! is called' do
-  Kernel.stubs(:abort)
   @result = Config.validate!
 end
 
-Then 'Kernel#abort should be called with a relevant message' do
-  Kernel.expects(:abort)
-        .with { |val| val.include?('environment variable') && val.include?('must contain') }
-        .returns(nil)
-end
+# It’s not idiomatic to include a Then in a When but the combination of Cucumber and Mocha forces
+# this, because the expectation (the Then) can only be set up in the When because the When runs
+# before the Then.
+When 'validate! is called then #abort should be called with a relevant message' do
+  expectation = Config.expects(:abort)
+                      .with(includes('The environment variable', 'must contain the GitHub'))
 
-Given 'the environment is missing ORG and TOKEN' do
-  ENV.delete 'ORG'
-  ENV.delete 'TOKEN'
+  # Because the normal abort exits the method, we’ll raise an exception to emulate that behavior.
+  expectation.raises(RuntimeError, 'this is a hack')
+
+  result, _stdout, _stderr = capture { Config.validate! }
+
+  # It’s not idiomatic to include expectations in a When but as per the comment at the top, the
+  # combination of Cucumber and Mocha forces this.
+  expect(result).to be_instance_of(RuntimeError)
+  expect(result.message).to include('this is a hack')
 end
