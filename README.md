@@ -24,7 +24,7 @@ Wherein:
 1. Bash or a Bash-like shell
 1. An Internet connection
 1. A GitHub Account
-1. A GitHub Personal Access Token (see below)
+1. A [GitHub Personal Access Token](#obtaining-a-github-personal-access-token)
 
 ### Obtaining a GitHub Personal Access Token
 
@@ -35,9 +35,12 @@ show you the token again after it’s been generated.
 
 ## Using the Tools
 
-In order to be explicit, many of the examples below include the required environment variables ORG and
-TOKEN right in the shell commands. This can be annoying to work with, so users may wish to set them
-once in their shell by running `export ORG=FundingCircle` etc.
+**Please note:** in order to be explicit and to facilitate copying-and-pasting all of the examples below include the
+required environment variables GITHUB_ORG and GITHUB_TOKEN.
+
+You **must** replace the placeholder values (REPLACE_ME) with an actual
+[GitHub Organization name](https://help.github.com/articles/about-organizations/) and an actual
+[Personal Access Token](#obtaining-a-github-personal-access-token) before running the examples.
 
 ### In Combination
 
@@ -51,24 +54,19 @@ Therefore you can combine many of these tools together using UNIX pipes.
 
 #### Some Examples
 
-First, you’ll want to `export` the required environment variables:
-
-```shell
-export ORG=FundingCircle
-export TOKEN=FOO
-```
-
 ##### First
 
 This would remove **all** your (org) subscriptions:
 
 ```shell
+export GITHUB_ORG=REPLACE_ME && export GITHUB_TOKEN=REPLACE_ME
 ./list repos --subscribed | tee repos_subscribed.bak | ./unsubscribe
 ```
 
 …and this would then restore those subscriptions:
 
 ```shell
+export GITHUB_ORG=REPLACE_ME && export GITHUB_TOKEN=REPLACE_ME
 cat repos_subscribed.bak | ./subscribe
 ```
 
@@ -77,12 +75,14 @@ cat repos_subscribed.bak | ./subscribe
 This would subscribe you to all repos with the topic _marketplace_:
 
 ```shell
+export GITHUB_ORG=REPLACE_ME && export GITHUB_TOKEN=REPLACE_ME
 ./list repos --topic marketplace | tee marketplace_repos | ./subscribe
 ```
 
 …and this would unsubscribe you from those repos:
 
 ```shell
+export GITHUB_ORG=REPLACE_ME && export GITHUB_TOKEN=REPLACE_ME
 cat marketplace_repos | ./unsubscribe
 ```
 
@@ -96,7 +96,8 @@ cat marketplace_repos | ./unsubscribe
 idea, different name.)
 
 ```shell
-ORG=FundingCircle TOKEN=FOO ./list repos --topic <topic> | tee repos
+export GITHUB_ORG=REPLACE_ME && export GITHUB_TOKEN=REPLACE_ME
+./list repos --topic <topic> | tee repos
 ```
 
 #### List All of the (Org) Repos
@@ -104,7 +105,8 @@ ORG=FundingCircle TOKEN=FOO ./list repos --topic <topic> | tee repos
 `list repos --all` will output all the repos that belong to the specified organization:
 
 ```shell
-ORG=FundingCircle TOKEN=FOO ./list repos --all
+GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
+./list repos --all
 ```
 
 #### List the (Org) Repos to Which You’re Subscribed
@@ -113,7 +115,8 @@ ORG=FundingCircle TOKEN=FOO ./list repos --all
 subscribed:
 
 ```shell
-ORG=FundingCircle TOKEN=FOO list repos --subscribed | tee repos
+GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
+./list repos --subscribed | tee repos
 ```
 
 #### Unsubscribing From a Set of (Org) Repos
@@ -121,7 +124,8 @@ ORG=FundingCircle TOKEN=FOO list repos --subscribed | tee repos
 Assuming the set of repos to which you’d like to unsubscribe is in the local file `repos`:
 
 ```shell
-cat repos | ORG=FundingCircle TOKEN=FOO ./unsubscribe
+GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
+cat repos | ./unsubscribe
 ```
 
 #### Subscribing to a Set of (Org) Repos
@@ -129,7 +133,8 @@ cat repos | ORG=FundingCircle TOKEN=FOO ./unsubscribe
 Assuming the set of repos to which you’d like to subscribe is in the local file `repos`:
 
 ```shell
-cat repos | ORG=FundingCircle TOKEN=FOO ./subscribe
+GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
+cat repos | ./subscribe
 ```
 
 ## Working on the Tools

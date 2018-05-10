@@ -3,10 +3,10 @@
 # Get the config from the environment and make it available.
 module Config
   REQUIRED = [
-    ['ORG',
-     'The environment variable ORG must contain the GitHub “organization” name.'],
-    ['TOKEN',
-     'The environment variable TOKEN must contain the GitHub OAuth token.']
+    ['GITHUB_ORG',
+     'The environment variable GITHUB_ORG must contain the GitHub “organization” name.'],
+    ['GITHUB_TOKEN',
+     'The environment variable GITHUB_TOKEN must contain the GitHub OAuth token.']
   ].freeze
 
   def self.validate!

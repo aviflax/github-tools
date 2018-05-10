@@ -1,7 +1,7 @@
 Feature: Validate that the environment contains the required variables with values
 
   Background:
-    Given the environment does not contain ORG nor TOKEN
+    Given the environment does not contain GITHUB_ORG nor GITHUB_TOKEN
 
   Scenario: The required variables do NOT all exist
     When validate! is called then #abort should be called with a relevant message

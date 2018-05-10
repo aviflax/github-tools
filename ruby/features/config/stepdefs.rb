@@ -2,9 +2,9 @@
 
 require 'config'
 
-Given 'the environment does not contain ORG nor TOKEN' do
-  ENV.delete 'ORG'
-  ENV.delete 'TOKEN'
+Given 'the environment does not contain GITHUB_ORG nor GITHUB_TOKEN' do
+  ENV.delete 'GITHUB_ORG'
+  ENV.delete 'GITHUB_TOKEN'
 end
 
 Given 'the environment DOES contain the variable UNDERWEAR_TYPE with the value boxers' do
@@ -32,13 +32,13 @@ Then 'the result should be nil' do
 end
 
 Given 'all the required environment variables exist with INvalid values' do
-  ENV['ORG'] = ''
-  ENV['TOKEN'] = ''
+  ENV['GITHUB_ORG'] = ''
+  ENV['GITHUB_TOKEN'] = ''
 end
 
 Given 'all the required environment variables exist with VALID values' do
-  ENV['ORG'] = 'The Rebellion'
-  ENV['TOKEN'] = 'R2D2+C3P0'
+  ENV['GITHUB_ORG'] = 'The Rebellion'
+  ENV['GITHUB_TOKEN'] = 'R2D2+C3P0'
 end
 
 When 'validate! is called' do
