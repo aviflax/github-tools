@@ -6,6 +6,6 @@ ENV TOKEN=""
 # near the top of features/support/env.rb that adds /work/src to $LOAD_PATH.
 WORKDIR /work
 
-COPY Gemfile ./
+COPY Gemfile Gemfile.lock ./
 RUN bundle install
 COPY . ./
