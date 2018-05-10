@@ -12,11 +12,9 @@ module Config
   def self.validate!
     REQUIRED.each do |var, msg|
       val = ENV[var]
-      unless val.is_a?(String) && !val.strip.empty?
-        puts msg
-        exit false
-      end
+      abort msg unless val.is_a?(String) && !val.strip.empty?
     end
+    nil
   end
 
   def self.[](name)
