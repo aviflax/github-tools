@@ -59,14 +59,14 @@ Therefore you can combine many of these tools together using UNIX pipes.
 This would remove **all** your (org) subscriptions:
 
 ```shell
-export GITHUB_ORG=REPLACE_ME && export GITHUB_TOKEN=REPLACE_ME
+export GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
 ./list repos --subscribed | tee repos_subscribed.bak | ./unsubscribe
 ```
 
 …and this would then restore those subscriptions:
 
 ```shell
-export GITHUB_ORG=REPLACE_ME && export GITHUB_TOKEN=REPLACE_ME
+export GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
 cat repos_subscribed.bak | ./subscribe
 ```
 
@@ -75,14 +75,14 @@ cat repos_subscribed.bak | ./subscribe
 This would subscribe you to all repos with the topic _marketplace_:
 
 ```shell
-export GITHUB_ORG=REPLACE_ME && export GITHUB_TOKEN=REPLACE_ME
+export GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
 ./list repos --topic marketplace | tee marketplace_repos | ./subscribe
 ```
 
 …and this would unsubscribe you from those repos:
 
 ```shell
-export GITHUB_ORG=REPLACE_ME && export GITHUB_TOKEN=REPLACE_ME
+export GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
 cat marketplace_repos | ./unsubscribe
 ```
 
@@ -96,7 +96,7 @@ cat marketplace_repos | ./unsubscribe
 idea, different name.)
 
 ```shell
-export GITHUB_ORG=REPLACE_ME && export GITHUB_TOKEN=REPLACE_ME
+export GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
 ./list repos --topic <topic> | tee repos
 ```
 
@@ -105,7 +105,7 @@ export GITHUB_ORG=REPLACE_ME && export GITHUB_TOKEN=REPLACE_ME
 `list repos --all` will output all the repos that belong to the specified organization:
 
 ```shell
-GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
+export GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
 ./list repos --all
 ```
 
