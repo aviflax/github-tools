@@ -142,6 +142,5 @@ cat repos | ./subscribe
 ### Running the Tests
 
 ```shell
-cd ruby
-docker run -t --rm `docker build -q .` cucumber
+ruby/run_all_tests.sh
 ```
