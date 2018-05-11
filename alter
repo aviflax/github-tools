@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e
+
+cd ruby
+
+IMAGE_ID=`docker build --quiet .`
+
+SCRIPT_NAME=`basename "$0"`
+
+echo $SCRIPT_NAME
+
+# The -i is required for the progress bar to work
+docker run -t --rm -e GITHUB_ORG -e GITHUB_TOKEN $IMAGE_ID ruby -Isrc scripts/$SCRIPT_NAME.rb "$@"
