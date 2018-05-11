@@ -6,6 +6,7 @@ require 'octokit'
 
 Config.validate!
 client = Config.make_client
+org = Config.fetch :github_org
 
 kind = ARGV[0]         # Kind of thing to list. Must be 'repos' (for now)
 first_flag = ARGV[1]   # Must be --all | --subscribed | --topic
@@ -21,9 +22,9 @@ end
 
 repos = case first_flag
         when '--subscribed'
-          client.subscriptions.select { |repo| repo.owner.login == Config[:org] }
+          client.subscriptions.select { |repo| repo.owner.login == org }
         when '--all', '--topic'
-          GitHubTools.org_repos topic, Config[:org], client
+          GitHubTools.org_repos topic, org, client
         else
           abort usage
         end

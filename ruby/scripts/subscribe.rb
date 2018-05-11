@@ -9,7 +9,7 @@ THREADS = 6
 
 Config.validate!
 client = Config.make_client
-org = Config[:org]
+org = Config.fetch :github_org
 
 repo_names = STDIN.readlines chomp: true
 
