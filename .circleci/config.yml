@@ -5,7 +5,8 @@ jobs:
       - image: docker:18-git
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           command: docker build . --tag $CIRCLE_PROJECT_REPONAME
           working_directory: ruby
