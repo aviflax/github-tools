@@ -1,0 +1,13 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: docker:18-git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          command: docker build . --tag $CIRCLE_PROJECT_REPONAME
+          working_directory: ruby
+      - run: docker run --tty $CIRCLE_PROJECT_REPONAME cucumber
+    working_directory: ~/github-tools
