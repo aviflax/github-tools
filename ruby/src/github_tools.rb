@@ -4,8 +4,8 @@ require 'octokit'
 
 # Various functions for working with GitHub
 module GitHubTools
-  def self.warn_now(s)
-    $stderr.print s
+  def self.warn_now(msg)
+    $stderr.print msg
     $stderr.flush
   end
 

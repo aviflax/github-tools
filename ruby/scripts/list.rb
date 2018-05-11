@@ -8,19 +8,28 @@ client = Config.make_client
 org = Config.fetch(:github_org).strip
 
 kind = ARGV[0]         # Kind of thing to list. Must be 'repos' (for now)
-first_flag = ARGV[1]   # Must be --all | --private | --subscribed | --topic
+first_flag = ARGV[1]   # See usage below
 topic = ARGV[2]        # Required if first_flag is --topic; otherwise should be nil/blank
 
 notes = {
-  forks: 'note: --forks lists repos that were forked INTO the specified org',
-  # As far as I can tell, `sources` is not limited to repos that *have* forks
-  sources: 'note: --sources lists repos that are not forks'
+  forks: 'lists repos that were forked INTO the specified org',
+  # As far as I can tell, `sources` is not limited to repos that *have* forks (as I had hoped)
+  sources: 'lists repos that are not forks'
 }
 
-usage = 'usage: list repos ' \
-        "<one of: (--all | --private | --public | --subscribed | --forks | --sources | --topic <topic>)> \n" \
-        " #{notes[:forks]} \n #{notes[:sources]}"
+usage = <<~HEREDOC
+  usage: list repos
+    and one of:
+      --all
+      --private
+      --public
+      --subscribed
+      --forks           #{notes[:forks]}
+      --sources         #{notes[:sources]}
+      --topic <topic>
+HEREDOC
 
+# This is ridiculous -- we should probably be using OptionParser.
 criterion = first_flag&.[](2..-1)&.downcase&.to_sym
 
 if kind != 'repos' || !first_flag&.start_with?('--') || criterion.nil? ||
@@ -29,7 +38,7 @@ if kind != 'repos' || !first_flag&.start_with?('--') || criterion.nil? ||
   abort usage
 end
 
-warn notes[criterion] if notes.include? criterion
+warn "note: this option (--#{criterion}) #{notes[criterion]}" if notes.include? criterion
 
 repos = case criterion
         when :subscribed
