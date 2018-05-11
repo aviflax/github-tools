@@ -1,0 +1,5 @@
+repos
+all_repos
+*_repos
+repos_*
+*.bak
