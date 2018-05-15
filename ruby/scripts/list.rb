@@ -24,13 +24,14 @@ usage = <<~HEREDOC
       --private
       --public
       --subscribed
-      --forks           #{notes[:forks]}
-      --sources         #{notes[:sources]}
+      --forks             #{notes[:forks]}
+      --forks-of <repo>   (use unqualified repo name; org context assumed)
+      --sources           #{notes[:sources]}
       --topic <topic>
 HEREDOC
 
 # This is ridiculous -- we should probably be using OptionParser.
-criterion = first_flag&.[](2..-1)&.downcase&.to_sym
+criterion = first_flag&.[](2..-1)&.downcase&.sub('-', '')&.to_sym
 
 if kind != 'repos' || !first_flag&.start_with?('--') || criterion.nil? ||
    (criterion == :topic && (topic.nil? || topic.empty?)) ||
@@ -40,15 +41,26 @@ end
 
 warn "note: this option (--#{criterion}) #{notes[criterion]}" if notes.include? criterion
 
-repos = case criterion
-        when :subscribed
-          GitHubTools.subscribed_repos org, client
-        when :topic
-          GitHubTools.org_repos org, client, topic: topic
-        when :all, :private, :public, :forks, :sources
-          GitHubTools.org_repos org, client, type: criterion.to_s
-        else
-          abort usage
-        end
+repos =
+  case criterion
+  when :subscribed
+    GitHubTools.subscribed_repos org, client
+  when :topic
+    GitHubTools.org_repos org, client, topic: topic
+  when :forksof
+    raise NotImplementedError
+  when :all, :private, :public, :forks, :sources
+    GitHubTools.org_repos org, client, type: criterion.to_s
+  else
+    abort usage
+  end
 
-puts repos.map(&:name).sort
+# When we print a repo that’s in the org specified by ENV['GITHUB_ORG] then we want to
+# print the short unqualified name. When we print one that is not, we want to print the full
+# qualified name.
+def printable_name(repo, org)
+  repo.owner.login == org ? repo.name : repo.full_name
+end
+
+puts repos.map { |repo| printable_name repo, org }
+          .sort
