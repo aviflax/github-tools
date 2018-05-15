@@ -2,7 +2,6 @@
 
 require 'config'
 require 'github_tools'
-require 'octokit'
 
 Config.validate!
 client = Config.make_client

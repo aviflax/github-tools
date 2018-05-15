@@ -2,7 +2,6 @@
 
 require 'config'
 require 'github_tools'
-require 'octokit'
 require 'parallel'
 
 THREADS = 6
