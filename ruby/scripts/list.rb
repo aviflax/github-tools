@@ -34,7 +34,7 @@ criterion = first_flag&.[](2..-1)&.downcase&.to_sym
 
 if kind != 'repos' || !first_flag&.start_with?('--') || criterion.nil? ||
    (criterion == :topic && (topic.nil? || topic.empty?)) ||
-   (criterion == :topic && !(topic.nil? || topic.empty?))
+   (criterion != :topic && !(topic.nil? || topic.empty?))
   abort usage
 end
 
