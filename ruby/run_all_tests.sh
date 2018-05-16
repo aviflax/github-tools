@@ -8,7 +8,7 @@ set -e
 # to work from within `ruby` as well:
 # I found the suggestion to use case here: https://stackoverflow.com/a/2830416/7012
 case `pwd` in
-  *ruby*) echo "" ;;
+  *ruby) echo "" ;;
   *)      cd ruby ;;
 esac
 
