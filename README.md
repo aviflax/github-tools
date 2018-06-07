@@ -144,3 +144,14 @@ cat repos | ./subscribe
 ```shell
 ruby/run_all_tests.sh
 ```
+
+## Copyright & License
+
+Copyright © 2018 Funding Circle Ltd.
+
+Distributed under [the BSD 3-Clause License](LICENSE).
+
+## Contributing
+
+* We (Funding Circle) cannot currently accept contributions of code or documentation, but we’re working on it.
+* Any and all feedback — questions, suggestions, bug reports, experience reports, etc — would be greatly appreciated! Please [create an issue](https://github.com/FundingCircle/github-tools/issues/new) and one of the maintainers will get back to you shortly.
