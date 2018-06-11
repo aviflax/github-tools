@@ -115,7 +115,7 @@ export GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
 subscribed:
 
 ```shell
-GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
+export GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
 ./list repos --subscribed | tee repos
 ```
 
@@ -124,7 +124,7 @@ GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
 Assuming the set of repos to which you’d like to unsubscribe is in the local file `repos`:
 
 ```shell
-GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
+export GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
 cat repos | ./unsubscribe
 ```
 
@@ -133,7 +133,7 @@ cat repos | ./unsubscribe
 Assuming the set of repos to which you’d like to subscribe is in the local file `repos`:
 
 ```shell
-GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
+export GITHUB_ORG=REPLACE_ME GITHUB_TOKEN=REPLACE_ME
 cat repos | ./subscribe
 ```
 
