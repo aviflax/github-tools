@@ -30,10 +30,11 @@ Given 'an initialized client is supplied' do
 end
 
 When 'I attempt to retrieve matching Repositories' do
-  @result, @stdout, @stderr = capture { GitHubTools.org_repos @topic, @org, @client }
+  @result, @stdout, @stderr = capture { GitHubTools.org_repos @org, @client, topic: @topic }
 end
 
 Then 'the result should be all of the org’s repositories' do
+  puts @result, @result.backtrace.join("\t\n") if @result.is_a? Exception
   expect(@result).to eq @all_repos
 end
 
@@ -55,6 +56,10 @@ Given 'that the user has hit the GitHub API’s rate limits' do
 end
 
 Then 'a TooManyRequests exception should have been raised' do
+  if @result.is_a?(Exception) && !@result.is_a?(Octokit::TooManyRequests)
+    puts @result, @result.backtrace.join("\t\n")
+  end
+
   expect(@result).to be_a Octokit::TooManyRequests
 end
 
