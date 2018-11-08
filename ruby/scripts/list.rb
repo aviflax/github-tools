@@ -8,22 +8,32 @@ client = Config.make_client
 org = Config.fetch(:github_org).strip
 
 kind = ARGV[0]         # Kind of thing to list. Must be 'repos' (for now)
-first_flag = ARGV[1]   # Must be --all | --subscribed | --topic
+first_flag = ARGV[1]   # Must be --all | --private | --subscribed | --topic
 topic = ARGV[2]        # Required if first_flag is --topic; otherwise should be nil/blank
 
-usage = 'usage: list repos --all | list repos --subscribed | list repos --topic <topic>'
+forks_note = 'note: --forks lists repos that were forked INTO the specified org'
 
-if kind != 'repos' || first_flag.nil? || !first_flag.start_with?('--') ||
-   (first_flag == '--topic' && (topic.nil? || topic.empty?)) ||
-   (first_flag != '--topic' && !(topic.nil? || topic.empty?))
+usage = 'usage: list repos ' \
+        "<one of: (--all | --private | --public | --subscribed | --forks | --topic <topic>)> \n" \
+        " #{forks_note}"
+
+criterion = first_flag&.[](2..-1)&.downcase&.to_sym
+
+if kind != 'repos' || !first_flag&.start_with?('--') || criterion.nil? ||
+   (criterion == :topic && (topic.nil? || topic.empty?)) ||
+   (criterion == :topic && !(topic.nil? || topic.empty?))
   abort usage
 end
 
-repos = case first_flag
-        when '--subscribed'
-          client.subscriptions.select { |repo| repo.owner.login.strip.casecmp? org }
-        when '--all', '--topic'
-          GitHubTools.org_repos topic, org, client
+warn forks_note if criterion == :forks
+
+repos = case criterion
+        when :subscribed
+          GitHubTools.subscribed_repos org, client
+        when :topic
+          GitHubTools.org_repos org, client, topic: topic
+        when :all, :private, :public, :forks
+          GitHubTools.org_repos org, client, type: criterion.to_s
         else
           abort usage
         end

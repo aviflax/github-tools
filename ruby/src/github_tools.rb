@@ -10,7 +10,7 @@ module GitHubTools
   end
 
   # Writes to stderr only, not stdout, because stdout is only for results
-  def self.org_repos_for_topic(topic, org, client)
+  def self.org_repos_for_topic(org, client, topic)
     warn_now "Retrieving list of #{org} repos with topic #{topic} ... "
 
     result = client.search_repos "user:#{org} topic:#{topic}"
@@ -34,13 +34,20 @@ module GitHubTools
     raise
   end
 
-  def self.org_repos(topic, org, client)
+  def self.org_repos(org, client, topic: nil, type: 'all')
     handle_errs(client) do
       if topic.nil? || topic.empty?
-        client.org_repos org
+        client.org_repos org, type: type
       else
-        org_repos_for_topic topic, org, client
+        org_repos_for_topic org, client, topic
       end
+    end
+  end
+
+  def self.subscribed_repos(org, client)
+    GitHubTools.handle_errs(client) do
+      stripped_org = org.strip
+      client.subscriptions.select { |repo| repo.owner.login.strip.casecmp? stripped_org }
     end
   end
 end
