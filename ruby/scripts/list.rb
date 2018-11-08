@@ -60,4 +60,4 @@ repos =
   end
 
 puts repos.map { |repo| GitHubTools.printable_name repo, org }
-          .sort
+          .sort_by(&:downcase)
