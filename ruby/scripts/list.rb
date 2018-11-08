@@ -5,7 +5,7 @@ require 'github_tools'
 
 Config.validate!
 client = Config.make_client
-org = Config.fetch :github_org
+org = Config.fetch(:github_org).strip
 
 kind = ARGV[0]         # Kind of thing to list. Must be 'repos' (for now)
 first_flag = ARGV[1]   # Must be --all | --subscribed | --topic
@@ -21,7 +21,7 @@ end
 
 repos = case first_flag
         when '--subscribed'
-          client.subscriptions.select { |repo| repo.owner.login == org }
+          client.subscriptions.select { |repo| repo.owner.login.strip.casecmp? org }
         when '--all', '--topic'
           GitHubTools.org_repos topic, org, client
         else
