@@ -12,7 +12,12 @@ case `pwd` in
   *)      cd ruby ;;
 esac
 
+echo 'Building Docker image...\c'
+image_id=$(docker build -q .)
+echo 'done.'
+
+echo 'Running tests...'
 # The -i is here just in case someone inserts an interactive debugging
 #   breakpoint into any of the code under test (or the tests).
 # The -t is needed so the output will be displayed in color.
-docker run -it --rm `docker build -q .` cucumber
+docker run -it --rm $image_id cucumber
