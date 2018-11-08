@@ -59,12 +59,5 @@ repos =
     abort usage
   end
 
-# When we print a repo that’s in the org specified by ENV['GITHUB_ORG] then we want to
-# print the short unqualified name. When we print one that is not, we want to print the full
-# qualified name.
-def printable_name(repo, org)
-  repo.owner.login == org ? repo.name : repo.full_name
-end
-
-puts repos.map { |repo| printable_name repo, org }
+puts repos.map { |repo| GitHubTools.printable_name repo, org }
           .sort

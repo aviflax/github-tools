@@ -44,11 +44,25 @@ module GitHubTools
     end
   end
 
+  # Accepts a repo and an org name, returns true if org is the owner of the repo.
+  # Uses a case-insensitive string comparison, but does not strip any operands so
+  # leading or trailing whitespace in the org name could yield a false negative.
+  def self.owned_by?(repo, org)
+    repo.owner.login.casecmp? org
+  end
+
+  ## TODO: need a test for confirming that the org arg (sourced from the GITHUB_ORG env var)
+  # is treated case-insensitively.
   def self.subscribed_repos(org, client)
     GitHubTools.handle_errs(client) do
-      ## TODO: need a test for confirming that the GITHUB_ORG env var is treated case-insensitively
-      stripped_org = org.strip
-      client.subscriptions.select { |repo| repo.owner.login.strip.casecmp? stripped_org }
+      client.subscriptions.select { |repo| owned_by? repo, org }
     end
+  end
+
+  # When we print a repo that’s in the org specified by ENV['GITHUB_ORG] then we want to
+  # print the short unqualified name. When we print one that is not, we want to print the full
+  # qualified name.
+  def self.printable_name(repo, org)
+    owned_by?(repo, org) ? repo.name : repo.full_name
   end
 end
