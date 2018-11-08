@@ -1,14 +1,12 @@
 #!/bin/sh
-
-# This script needs to work in Alpine Linux without bash.
-
+# This script needs to work in Alpine Linux which by default doesn’t have bash.
 set -e
 
 # This script is meant to be run from the root of the repo, but this enables it
 # to work from within `ruby` as well:
 # I found the suggestion to use case here: https://stackoverflow.com/a/2830416/7012
 case `pwd` in
-  *ruby) echo "" ;;
+  *ruby)  true;;
   *)      cd ruby ;;
 esac
 

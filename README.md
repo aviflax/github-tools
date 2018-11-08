@@ -142,7 +142,7 @@ cat repos | ./subscribe
 ### Running the Tests
 
 ```shell
-ruby/run_all_tests.sh
+ruby/bin/run_all_tests.sh
 ```
 
 ## Copyright & License
