@@ -39,7 +39,7 @@ end
 if kind != 'repos' || !first_flag&.start_with?('--') || criterion.nil? ||
    (criterion == :topic && (topic.nil? || topic.empty?)) ||
    (criterion == :forksof && (repo_name.nil? || repo_name.empty?)) ||
-   (!%i[topic forksof].include(:criterion) && !(arg_val.nil? || arg_val.empty?))
+   (!%i[topic forksof].include?(:criterion) && !(arg_val.nil? || arg_val.empty?))
   abort usage
 end
 
