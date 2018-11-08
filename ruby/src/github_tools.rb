@@ -46,6 +46,7 @@ module GitHubTools
 
   def self.subscribed_repos(org, client)
     GitHubTools.handle_errs(client) do
+      ## TODO: need a test for confirming that the GITHUB_ORG env var is treated case-insensitively
       stripped_org = org.strip
       client.subscriptions.select { |repo| repo.owner.login.strip.casecmp? stripped_org }
     end
