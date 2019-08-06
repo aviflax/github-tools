@@ -59,6 +59,17 @@ module GitHubTools
     end
   end
 
+  # Returns a commit object as a hash, or nil if no commits are found.
+  def self.first_commit(repo_full_name, client)
+    # query includes merge:false because a commit search is not allowed to have repo as the only
+    # criterion.
+    query = "repo:#{repo_full_name} merge:false"
+    result = client.search_commits query, sort: 'author-date',
+                                          order: 'asc',
+                                          per_page: 1 # not working?
+    result.items.first
+  end
+
   # When we print a repo that’s in the org specified by ENV['GITHUB_ORG] then we want to
   # print the short unqualified name. When we print one that is not, we want to print the full
   # qualified name.
