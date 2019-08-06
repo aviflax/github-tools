@@ -54,8 +54,8 @@ if kind != 'repos' ||
    !mode_arg&.start_with?('--') ||
    mode.nil? ||
    (mode == :topic && topic&.empty?) ||
-   (mode == :forks_of && topic&.empty?) # || TODO: FIX and RESTORE WTF # (!%i[topic forks_of].include?(mode) && !arg_val&.empty?)
-  # puts kind, mode, arg_val, format_arg, mode
+   (mode == :forks_of && topic&.empty?)
+  # || TODO: FIX and RESTORE WTF # (!%i[topic forks_of].include?(mode) && !arg_val&.empty?)
   abort usage
 end
 
@@ -79,9 +79,9 @@ repos =
   end
 
 ## TODO: move to a module
-sorted_repo_names = lambda { |repos|
-  repos.map { |repo| GitHubTools.printable_name repo, org }
-       .sort_by(&:downcase)
+sorted_repo_names = lambda { |rs|
+  rs.map { |repo| GitHubTools.printable_name repo, org }
+    .sort_by(&:downcase)
 }
 
 ## TODO: let’s move some of this logic into a module
