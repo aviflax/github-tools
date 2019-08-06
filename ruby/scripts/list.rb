@@ -15,7 +15,7 @@ notes = {
 
 usage = <<~HEREDOC
   usage: list repos
-    and one of:
+    and one mode:
       --all
       --private
       --public
@@ -25,29 +25,44 @@ usage = <<~HEREDOC
       --sources           #{notes[:sources]}
       --topic <topic>
       --no-owners
+
+    and optionally one of:
+      --format=<format>   (either 'names-only' or 'json-stream')
 HEREDOC
+
+def normalize(arg_val)
+  arg_val.downcase&.sub('-', '_')&.to_sym
+end
 
 # I tried OptionParser, I swear, but it doesn’t seem to support required arguments nor a case
 # wherein at least one of a set of options is required.
-kind, first_flag, arg_val = ARGV
-criterion = first_flag&.[](2..-1)&.downcase&.sub('-', '_')&.to_sym
+# TODO: Find an argument parsing library that’ll work for our needs and USE IT.
+# repos --no-owners --format json-stream
+# kind  first_flag  arg_val  format_arg
+kind, mode_arg, arg_val, format_arg = ARGV
+mode = normalize(mode_arg&.[](2..-1))
 
-case criterion
+case mode
 when :forks_of then repo_name = arg_val
 when :topic then topic = arg_val
 end
 
-if kind != 'repos' || !first_flag&.start_with?('--') || criterion.nil? ||
-   (criterion == :topic && (topic.nil? || topic.empty?)) ||
-   (criterion == :forks_of && (repo_name.nil? || repo_name.empty?)) ||
-   (!%i[topic forks_of].include?(criterion) && !(arg_val.nil? || arg_val.empty?))
+# TODO: WTF
+format = ARGV.join.include?('--format=json-stream') ? :json_stream : :names_only
+
+if kind != 'repos' ||
+   !mode_arg&.start_with?('--') ||
+   mode.nil?
+   (mode == :topic && topic&.empty?) ||
+   (mode == :forks_of && topic&.empty?) # || TODO: FIX and RESTORE WTF # (!%i[topic forks_of].include?(mode) && !arg_val&.empty?)
+  # puts kind, mode, arg_val, format_arg, mode
   abort usage
 end
 
-warn "note: this option (--#{criterion}) #{notes[criterion]}" if notes.include? criterion
+warn "note: this option (--#{mode}) #{notes[mode]}" if notes.include? mode
 
 repos =
-  case criterion
+  case mode
   when :subscribed
     GitHubTools.subscribed_repos org, client
   when :topic
@@ -58,10 +73,29 @@ repos =
     GitHubTools.org_repos(org, client)
                .reject { |repo| GitHubTools::Filters.codeowners? repo, client }
   when :all, :private, :public, :forks, :sources
-    GitHubTools.org_repos org, client, type: criterion.to_s
+    GitHubTools.org_repos org, client, type: mode.to_s
   else
     abort usage
   end
 
-puts repos.map { |repo| GitHubTools.printable_name repo, org }
-          .sort_by(&:downcase)
+## TODO: move to a module
+sorted_repo_names = lambda { |repos|
+  repos.map { |repo| GitHubTools.printable_name repo, org }
+       .sort_by(&:downcase)
+}
+
+## TODO: let’s move some of this logic into a module
+case format
+when :names_only
+  puts sorted_repo_names.call(repos)
+when :json_stream
+  # WTF Refactor this shit!
+  # TODO: this is only doing a shallow conversion to a hash; the output includes various values
+  # like "permissions":"#<Sawyer::Resource:0x00007ff736249660>"
+  repos.map(&:marshal_dump)
+       .map(&:first)
+       .map(&:to_json)
+       .map { |repo_json| puts repo_json }
+else
+  abort usage
+end
