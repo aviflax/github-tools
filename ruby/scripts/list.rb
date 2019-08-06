@@ -39,7 +39,7 @@ end
 # TODO: Find an argument parsing library that’ll work for our needs and USE IT.
 # repos --no-owners --format json-stream
 # kind  first_flag  arg_val  format_arg
-kind, mode_arg, arg_val, format_arg = ARGV
+kind, mode_arg, arg_val, _format_arg = ARGV
 mode = normalize(mode_arg&.[](2..-1))
 
 case mode
@@ -52,7 +52,7 @@ format = ARGV.join.include?('--format=json-stream') ? :json_stream : :names_only
 
 if kind != 'repos' ||
    !mode_arg&.start_with?('--') ||
-   mode.nil?
+   mode.nil? ||
    (mode == :topic && topic&.empty?) ||
    (mode == :forks_of && topic&.empty?) # || TODO: FIX and RESTORE WTF # (!%i[topic forks_of].include?(mode) && !arg_val&.empty?)
   # puts kind, mode, arg_val, format_arg, mode
