@@ -24,6 +24,7 @@ usage = <<~HEREDOC
       --forks-of <repo>   (use unqualified repo name; org context assumed)
       --sources           #{notes[:sources]}
       --topic <topic>
+      --no-owners
 HEREDOC
 
 # I tried OptionParser, I swear, but it doesn’t seem to support required arguments nor a case
@@ -53,6 +54,9 @@ repos =
     GitHubTools.org_repos org, client, topic: topic
   when :forks_of
     raise NotImplementedError, "Cannot yet not list forks of #{repo_name}"
+  when :no_owners
+    GitHubTools.org_repos(org, client)
+               .reject { |repo| GitHubTools::Filters.codeowners? repo, client }
   when :all, :private, :public, :forks, :sources
     GitHubTools.org_repos org, client, type: criterion.to_s
   else

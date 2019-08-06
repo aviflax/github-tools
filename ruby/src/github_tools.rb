@@ -65,4 +65,15 @@ module GitHubTools
   def self.printable_name(repo, org)
     owned_by?(repo, org) ? repo.name : repo.full_name
   end
+
+  # Each filter must be a static method that accepts a repo hash and a client.
+  module Filters
+    def self.codeowners?(repo, client)
+      ## TODO: look into a way to have the client return the response object instead of raising
+      client.contents repo[:full_name], path: '.github/CODEOWNERS'
+      true
+    rescue Octokit::NotFound
+      false
+    end
+  end
 end
