@@ -67,6 +67,8 @@ module GitHubTools
   end
 
   # Each filter must be a static method that accepts a repo hash and a client.
+  # TODO: since Ruby 2.6 added function composition, we should maybe have this module contain
+  #       procs rather than static methods.
   module Filters
     def self.codeowners?(repo, client)
       ## TODO: look into a way to have the client return the response object instead of raising

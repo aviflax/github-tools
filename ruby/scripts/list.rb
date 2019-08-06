@@ -13,6 +13,8 @@ notes = {
   sources: 'lists repos that are not forks'
 }
 
+# TODO: these options should be composable.
+#   e.g. list repos --no-owners --topic=kafka --format=json-stream --include-first-committer
 usage = <<~HEREDOC
   usage: list repos
     and one mode:
