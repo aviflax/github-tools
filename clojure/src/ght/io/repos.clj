@@ -1,4 +1,4 @@
-(ns ghr.io.repos
+(ns ght.io.repos
   (:require [clojure.string :refer [lower-case]]
             [tentacles.repos :as tr]
             [tentacles.search :as ts]))
@@ -31,5 +31,11 @@
           (tr/watching user-name {:all-pages true})))
 
 (defn has-codeowners?
-  [repo]
-  (boolean (tr/contents (owner-name repo) (:simple_name repo) ".github/CODEOWNERS")))
+  [{repo-name :name :as repo}]
+  (boolean (tr/contents (owner-name repo) repo-name ".github/CODEOWNERS")))
+
+(defn printable-name
+  [repo org-name]
+  (if (owned-by? repo org-name)
+    (:name repo)
+    (:full_name repo)))
