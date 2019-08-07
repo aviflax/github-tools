@@ -1,4 +1,4 @@
-(ns ght.list
+(ns ght.io.list
   (:require [clojure.string :refer [lower-case]]
             [tentacles.repos :as tr]
             [tentacles.search :as ts]))
