@@ -19,8 +19,9 @@
   (get-in repo [:owner :login]))
 
 (defn owned-by?
-  [repo org-name]
-  (apply = (map lower-case [(owner-name repo) org-name])))
+  "username can be an org name."
+  [repo username]
+  (apply = (map lower-case [(owner-name repo) username])))
 
 (defn org-watching
   "Returns a (possibly empty) sequential collection of maps that represent repositories owned by the
