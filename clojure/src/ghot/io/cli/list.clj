@@ -3,21 +3,21 @@
   (:gen-class)
   (:require [clojure.string :refer [join]]
             [clojure.tools.cli :refer [parse-opts]]
-            [ght.io.list :refer [org-repos-watching org-repos-for-topic]]
-            [ght.io.repos :refer [has-codeowners?]]
+            [ght.io.repos :refer [has-codeowners? org-repos-watching org-repos-for-topic]]
             [tentacles.repos :refer [org-repos]]))
 
 (def cli-opts-spec
   [[nil "--org ORG-NAME" "The GitHub username of the org owning repos to be listed."]
-   [nil "--all"]
-   [nil "--private" "List only private repos. Cannot be used with --public."]
-   [nil "--public" "List only public repos. Cannot be used with --private."]
-   [nil "--watching" "List the repos of the specified org which the user is watching."]
-   [nil "--forks" "List only forks. Cannot be used with --sources."]
+   [nil "--all" "List all repos owned by the org."]
+   [nil "--private" "List only private repos owned by the org."]
+   [nil "--public" "List only public repos owned by the org."]
+   [nil "--watching" "List the repos that the user is watching and are owned by the org."]
+   [nil "--forks" "List only forks owned by the org."]
    ;; TODO [nil "--forks-of REPO-NAME"]
-   [nil "--sources" "List only sources. Cannot be used with --forks."]
-   [nil "--topic TOPIC" "List only repos with the specified topic."]
-   [nil "--no-codeowners" "List only repos that do not have a CODEOWNERS file."]
+   [nil "--sources" "List only sources owned by the org."]
+   [nil "--topic TOPIC" "List only repos owned by the org with the specified topic."
+    :default nil]
+   [nil "--no-codeowners" "List only repos owned by the org that do not have a CODEOWNERS file."]
    [nil "--format FORMAT" "Specifies the output format."
     :default :names-only
     :parse-fn keyword
@@ -25,12 +25,18 @@
    ["-h" "--help" "Prints the synopsis and a list of the most commonly used commands and exits. Other options are ignored."]
    ["-v" "--verbose"]])
 
+(def mutually-exclusive-opts [:private :public :forks :sources
+                              :all :topic :no-codeowners :watching])
+
+(def meo-printable (str "--" (join ", --" (sort (map name mutually-exclusive-opts)))))
+
 (defn- usage-message [summary & specific-messages]
   (str "Usage: ght list repos OPTIONS\n\nOptions:\n"
        summary
-       (when specific-messages
-         (str "\n\n"
-              (join " " specific-messages)))
+       "\n\n"
+       (if specific-messages
+         (join " " specific-messages)
+         (str "NB: the options " meo-printable " are mutually exclusive."))
        "\n\n"
        "Full documentation is at https://github.com/FundingCircle/ght/"))
 
@@ -46,7 +52,7 @@
 
 (defn- check-cli-opts
   [{:keys [summary errors]
-    {:keys [help private public forks sources]} :options}]
+    {:keys [help]} :options :as opts}]
   (cond
     help
     (exit 0 (usage-message summary))
@@ -54,11 +60,11 @@
     errors
     (exit 1 (usage-message summary "Errors:\n  " (join "\n  " errors)))
 
-    (and private public)
-    (exit 1 (usage-message summary "Error: --private and --public cannot be used together."))
-
-    (and forks sources)
-    (exit 1 (usage-message summary "Error: --forks and --sources cannot be used together."))))
+    (> 1 (->> (select-keys opts mutually-exclusive-opts)
+              (vals)
+              (remove not)
+              (count)))
+    (exit 1 (usage-message summary "Error: the options" meo-printable "are mutually exclusive."))))
 
 ; (defn warn
 ;   [& strs]
@@ -70,7 +76,6 @@
    wherein `org` is a String containing the org’s GitHub username."
   [{:keys [no-codeowners topic watching] :as _cli-opts}]
   (cond
-    ;; TODO: this approach seems to mean that we can’t filter watching repos by a topic
     watching      (fn [org & [options]] (org-repos-watching org :TODO options))
     topic         (fn [org & [options]] (org-repos-for-topic org topic options))
     no-codeowners (fn [org & [options]] (filter has-codeowners? (org-repos org options)))
