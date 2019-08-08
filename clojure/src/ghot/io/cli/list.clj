@@ -90,7 +90,7 @@
              :all)
    :all-pages true})
 
-(defn- print-result
+(defn- print-list
   "Hopefully the repos coll is lazy so this streams."
   [repos org format]
   (case format
@@ -102,7 +102,9 @@
 (defn -main
   [& args]
   (let [{{:keys [org format] :as cli-opts} :options :as parsed} (parse-opts args cli-opts-spec)
-        _ (check-cli-opts (select-keys parsed [:summary :errors :options])) ; exits or throws if there’s a problem
-        ;; TODO: ensure repos is lazy so the output will “stream”
-        repos ((repos-fn cli-opts) org (api-opts cli-opts))]
-    (print-result repos org format)))
+        _ (check-cli-opts parsed) ; exits or throws if there’s a problem
+        get-repos (repos-fn cli-opts)]
+    ;; TODO: try to ensure the result is lazy so the output will “stream”
+    (print-list (get-repos org (api-opts cli-opts))
+                org
+                format)))
