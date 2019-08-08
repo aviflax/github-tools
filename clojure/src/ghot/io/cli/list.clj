@@ -34,11 +34,15 @@
        "\n\n"
        "Full documentation is at https://github.com/FundingCircle/ght/"))
 
+(def exit-on-exit? "Set to false for testing." (atom true))
+
 (defn exit
   [code & msgs]
   (when (seq msgs)
     (apply println msgs))
-  (System/exit code))
+  (if @exit-on-exit?
+    (System/exit code)
+    (throw (ex-info "Normally the system would have exited here." {:exit-code code}))))
 
 (defn- check-cli-opts
   [{:keys [summary errors]
