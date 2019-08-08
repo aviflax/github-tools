@@ -1,9 +1,11 @@
 (ns ght.io.cli.list
   "The CLI command for listing things. (Initially just repos.)"
   (:gen-class)
-  (:require [clojure.string :refer [join]]
+  (:require [clojure.data.json :as json]
+            [clojure.string :refer [join]]
             [clojure.tools.cli :refer [parse-opts]]
             [ght.io.repos :refer [has-codeowners? org-repos-watching org-repos-for-topic]]
+            [ght.repos :refer [printable-name]]
             [tentacles.repos :refer [org-repos]]))
 
 (def cli-opts-spec
@@ -88,8 +90,19 @@
              :all)
    :all-pages true})
 
+(defn- print-result
+  "Hopefully the repos coll is lazy so this streams."
+  [repos org format]
+  (case format
+    :names-only
+    (run! #(println (printable-name % org)) repos)
+    :json-stream
+    (run! #(println (json/write-str %)) repos)))
+
 (defn -main
   [& args]
-  (let [{:keys [org options] :as parsed} (parse-opts args cli-opts-spec)]
-    (check-cli-opts (select-keys parsed [:summary :errors :options])) ; exits or throws if there’s a problem
-    ((repos-fn options) org (api-opts options))))
+  (let [{{:keys [org format] :as cli-opts} :options :as parsed} (parse-opts args cli-opts-spec)
+        _ (check-cli-opts (select-keys parsed [:summary :errors :options])) ; exits or throws if there’s a problem
+        ;; TODO: ensure repos is lazy so the output will “stream”
+        repos ((repos-fn cli-opts) org (api-opts cli-opts))]
+    (print-result repos org format)))
