@@ -3,11 +3,6 @@
             [tentacles.repos :as tr]
             [tentacles.search :as ts]))
 
-; (defn warn
-;   [& strs]
-;   (binding [*out* *err*]
-;     (apply println strs)))
-
 (defn org-repos-for-topic
   "Returns a (possibly empty) sequential collection of maps that represent repositories, or throws."
   [org-name topic & options]
@@ -19,4 +14,4 @@
   org to which the user is subscribed (watching), or throws."
   [org-name user-name & options]
   (filter (fn [repo] (owned-by? repo org-name))
-          (tr/watching user-name {:all-pages true} options)))
+          (tr/watching user-name (assoc options :all-pages true))))

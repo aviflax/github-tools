@@ -7,7 +7,7 @@
             [ght.io.repos :refer [has-codeowners?]]
             [tentacles.repos :refer [org-repos]]))
 
-(def opts-spec
+(def cli-opts-spec
   [[nil "--org ORG-NAME" "The GitHub username of the org owning repos to be listed."]
    [nil "--all"]
    [nil "--private" "List only private repos. Cannot be used with --public."]
@@ -40,7 +40,7 @@
     (apply println msgs))
   (System/exit code))
 
-(defn- check-opts
+(defn- check-cli-opts
   [{:keys [summary errors]
     {:keys [help private public forks sources]} :options}]
   (cond
@@ -56,31 +56,31 @@
     (and forks sources)
     (exit 1 (usage-message summary "Error: --forks and --sources cannot be used together."))))
 
-(def base-api-opts
-  "Our default/baseline set of options we want to supply to every call of every tentacles function
-  that accepts options (most do)."
-  {:all-pages true})
+; (defn warn
+;   [& strs]
+;   (binding [*out* *err*]
+;     (apply println strs)))
 
 (defn- repos-fn
   "Returns a function with the same signature as tentacles.repos/org-repos: (fn [org & [options]])
    wherein `org` is a String containing the org’s GitHub username."
-  [{:keys [no-codeowners topic watching] :as _opts}]
+  [{:keys [no-codeowners topic watching] :as _cli-opts}]
   (cond
     ;; TODO: this approach seems to mean that we can’t filter watching repos by a topic
-    watching      (fn [org & [options]] (org-repos-watching org :TODO (merge base-api-opts options)))
-    topic         (fn [org & [options]] (org-repos-for-topic org topic (merge base-api-opts options)))
-    no-codeowners (fn [org & [options]] (filter has-codeowners? (org-repos org (merge base-api-opts options))))
-    :default      (fn [org & [options]] (org-repos org (merge base-api-opts options)))))
+    watching      (fn [org & [options]] (org-repos-watching org :TODO options))
+    topic         (fn [org & [options]] (org-repos-for-topic org topic options))
+    no-codeowners (fn [org & [options]] (filter has-codeowners? (org-repos org options)))
+    :default      org-repos))
 
-(defn- type-param
-  [opts]
-  (or (ffirst (filter second
-                      (select-keys opts [:private :public :forks :sources])))
-      :all))
+(defn- api-opts
+  [cli-opts]
+  {:type (or (ffirst (filter second
+                      (select-keys cli-opts [:private :public :forks :sources])))
+             :all)
+   :all-pages true})
 
 (defn -main
   [& args]
-  (let [;{:keys [options summary] :as parsed}
-    parsed (parse-opts args opts-spec)]
-    (check-opts parsed) ; exits or throws if there’s a problem
-    ))
+  (let [{:keys [org options] :as parsed} (parse-opts args cli-opts-spec)]
+    (check-cli-opts (select-keys parsed [:summary :errors :options])) ; exits or throws if there’s a problem
+    ((repos-fn options) org (api-opts options))))
