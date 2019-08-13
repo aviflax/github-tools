@@ -1,10 +1,11 @@
-(ns ghot.io.cli.list
+(ns ghot.io.cli.list-repos
   "The CLI command for listing things. (Initially just repos.)"
   (:gen-class)
   (:require [clojure.data.json :as json]
             [clojure.pprint :refer [pprint]]
             [clojure.string :refer [blank? join]]
             [clojure.tools.cli :refer [parse-opts]]
+            [ghot.io.cli.util :refer [exit]]
             [ghot.io.repos :refer [has-codeowners? org-repos-watching org-repos-for-topic]]
             [ghot.repos :refer [printable-name]]
             [tentacles.repos :refer [org-repos]]))
@@ -29,41 +30,36 @@
 
    ;; Optional options.
    [nil "--format FORMAT" "Specifies the output format."
-    :default :names-only
+    :default "names-only"
     :parse-fn keyword
     :validate [#{:names-only :json-stream} "Supported values are 'names-only' and 'json-stream'."]]
    ["-h" "--help" "Prints the synopsis and a list of the most commonly used commands and exits. Other options are ignored."]
    [nil  "--debug" "For developers of ghot."]
-   ["-v" "--verbose"]])
+   [nil "--verbose"]])
 
-(def mode-opts [:private :public :forks :sources :all :topic :no-codeowners :watching])
+(def mode-opts
+  [:private :public :forks :sources :all :topic :no-codeowners :watching])
 
-(def mode-opts-printable (str "--" (join ", --" (sort (map name mode-opts)))))
+(def mode-opts-printable
+  (str "--" (join ", --" (sort (map name mode-opts)))))
 
-(defn- usage-message [summary & specific-messages]
+(def mode-opts-msg
+  (str "one and only one of the mode options (" mode-opts-printable ") must be specified."))
+
+(defn- usage-message
+  [summary & specific-messages]
   (str "Usage: ghot list repos OPTIONS\n\nOptions:\n"
        summary
        "\n\n"
-       (if specific-messages
+       (if (seq specific-messages)
          (join " " specific-messages)
-         (str "NB: the options " mode-opts-printable " are mutually exclusive."))
+         (str "NB: " mode-opts-msg))
        "\n\n"
        "Full documentation is at https://github.com/FundingCircle/ght/"))
 
-;; Set to false for testing.
-(defonce exit-on-exit? (atom true))
-
-(defn exit
-  [code & msgs]
-  (when (seq msgs)
-    (apply println msgs))
-  (if @exit-on-exit?
-    (System/exit code)
-    (throw (ex-info "Normally the system would have exited here." {:exit-code code}))))
-
 (defn- check-cli-opts
   [{:keys [summary errors]
-    {:keys [help org token]} :options :as opts}]
+    {:keys [help org token] :as opts} :options}]
   (cond
     help
     (exit 0 (usage-message summary))
@@ -80,16 +76,8 @@
     (not= 1 (->> (select-keys opts mode-opts)
                  (vals)
                  (remove not)
-                 ; (println)
                  (count)))
-    (exit 1 (usage-message summary "Error: one and only one of the mode options"
-                                   (str "(" mode-opts-printable ")")
-                                   "must be specified."))))
-
-; (defn warn
-;   [& strs]
-;   (binding [*out* *err*]
-;     (apply println strs)))
+    (exit 1 (usage-message summary "Error:" mode-opts-msg))))
 
 (defn- repos-fn
   "Returns a function with the same signature as tentacles.repos/org-repos: (fn [org & [options]])
