@@ -1,11 +1,11 @@
-(ns ght.io.cli.list
+(ns ghot.io.cli.list
   "The CLI command for listing things. (Initially just repos.)"
   (:gen-class)
   (:require [clojure.data.json :as json]
             [clojure.string :refer [join]]
             [clojure.tools.cli :refer [parse-opts]]
-            [ght.io.repos :refer [has-codeowners? org-repos-watching org-repos-for-topic]]
-            [ght.repos :refer [printable-name]]
+            [ghot.io.repos :refer [has-codeowners? org-repos-watching org-repos-for-topic]]
+            [ghot.repos :refer [printable-name]]
             [tentacles.repos :refer [org-repos]]))
 
 (def cli-opts-spec

@@ -1,6 +1,6 @@
-(ns ght.io.repos
+(ns ghot.io.repos
   "Functions that supplement those in tentacles.repos."
-  (:require [ght.repos :refer [owned-by? owner-name]]
+  (:require [ghot.repos :refer [owned-by? owner-name]]
             [tentacles.core :refer [api-call]]
             [tentacles.repos :as tr]
             [tentacles.search :as ts]))

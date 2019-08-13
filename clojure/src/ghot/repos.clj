@@ -1,4 +1,4 @@
-(ns ght.repos
+(ns ghot.repos
   (:require [clojure.string :refer [lower-case]]))
 
 (defn owner-name
