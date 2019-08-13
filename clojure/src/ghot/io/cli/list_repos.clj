@@ -5,7 +5,7 @@
             [clojure.pprint :refer [pprint]]
             [clojure.string :refer [blank? join]]
             [clojure.tools.cli :refer [parse-opts]]
-            [ghot.io.cli.util :refer [exit]]
+            [ghot.io.cli.util :refer [exit verbose? verbose]]
             [ghot.io.repos :refer [has-codeowners? org-repos-watching org-repos-for-topic]]
             [ghot.repos :refer [printable-name]]
             [tentacles.repos :refer [org-repos]]))
@@ -30,7 +30,7 @@
 
    ;; Optional options.
    [nil "--format FORMAT" "Specifies the output format."
-    :default "names-only"
+    :default :names-only
     :parse-fn keyword
     :validate [#{:names-only :json-stream} "Supported values are 'names-only' and 'json-stream'."]]
    ["-h" "--help" "Prints the synopsis and a list of the most commonly used commands and exits. Other options are ignored."]
@@ -84,12 +84,12 @@
    wherein `org` is a String containing the org’s GitHub username."
   [{:keys [no-codeowners topic watching] :as _cli-opts}]
   (cond
-    watching      (fn [org & [options]] (org-repos-watching org :TODO options))
+    watching      (fn [org & [options]] (org-repos-watching org :TO-USERNAME-DO options))
     topic         (fn [org & [options]] (org-repos-for-topic org topic options))
     no-codeowners (fn [org & [options]] (filter has-codeowners? (org-repos org options)))
     :default      org-repos))
 
-(defn- api-opts
+(defn- cli-opts->api-opts
   [{:keys [token] :as cli-opts}]
   {:oauth-token token
    :type (or (ffirst (filter second
@@ -108,12 +108,19 @@
 
 (defn -main
   [& args]
-  (let [{{:keys [org format debug] :as cli-opts} :options :as parsed} (parse-opts args cli-opts-spec :in-order true)
+  (let [{{:keys [org format debug] :as cli-opts} :options :as parsed}
+        (parse-opts args cli-opts-spec :in-order true)
+        _ (reset! verbose? (:verbose cli-opts))
         _ (when debug
             (pprint parsed))
         _ (check-cli-opts parsed) ; exits or throws if there’s a problem
-        get-repos (repos-fn cli-opts)]
+        _ (verbose "foo")
+        f (repos-fn cli-opts)
+        api-opts (cli-opts->api-opts cli-opts)
+        _ (verbose "foo")
+        _ (verbose "About to call API with options:" api-opts)
+        repos (f org api-opts)
+        _ (verbose "repos:" repos)
+        ]
     ;; TODO: try to ensure the result is lazy so the output will “stream”
-    (print-list (get-repos org (api-opts cli-opts))
-                org
-                format)))
+    (print-list repos org format)))
