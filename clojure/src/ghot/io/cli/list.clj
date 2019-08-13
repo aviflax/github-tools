@@ -2,47 +2,56 @@
   "The CLI command for listing things. (Initially just repos.)"
   (:gen-class)
   (:require [clojure.data.json :as json]
-            [clojure.string :refer [join]]
+            [clojure.pprint :refer [pprint]]
+            [clojure.string :refer [blank? join]]
             [clojure.tools.cli :refer [parse-opts]]
             [ghot.io.repos :refer [has-codeowners? org-repos-watching org-repos-for-topic]]
             [ghot.repos :refer [printable-name]]
             [tentacles.repos :refer [org-repos]]))
 
 (def cli-opts-spec
-  [[nil "--org ORG-NAME" "The GitHub username of the org owning repos to be listed."]
+  [;; Scope and auth options. All are required.
+   [nil "--org ORG-NAME" "The GitHub username of the org owning repos to be listed."]
+   [nil "--token TOKEN" "A GitHub Personal Access Token for interacting with the GitHub API."]
+
+   ;; Mode options. One and only one of these must be specified.
    [nil "--all" "List all repos owned by the org."]
    [nil "--private" "List only private repos owned by the org."]
    [nil "--public" "List only public repos owned by the org."]
-   [nil "--watching" "List the repos that the user is watching and are owned by the org."]
+   [nil "--watching" (str "List the repos that the user (who owns the token) is watching and are"
+                          " owned by the org.")]
    [nil "--forks" "List only forks owned by the org."]
    ;; TODO [nil "--forks-of REPO-NAME"]
    [nil "--sources" "List only sources owned by the org."]
    [nil "--topic TOPIC" "List only repos owned by the org with the specified topic."
     :default nil]
    [nil "--no-codeowners" "List only repos owned by the org that do not have a CODEOWNERS file."]
+
+   ;; Optional options.
    [nil "--format FORMAT" "Specifies the output format."
     :default :names-only
     :parse-fn keyword
     :validate [#{:names-only :json-stream} "Supported values are 'names-only' and 'json-stream'."]]
    ["-h" "--help" "Prints the synopsis and a list of the most commonly used commands and exits. Other options are ignored."]
+   [nil  "--debug" "For developers of ghot."]
    ["-v" "--verbose"]])
 
-(def mutually-exclusive-opts [:private :public :forks :sources
-                              :all :topic :no-codeowners :watching])
+(def mode-opts [:private :public :forks :sources :all :topic :no-codeowners :watching])
 
-(def meo-printable (str "--" (join ", --" (sort (map name mutually-exclusive-opts)))))
+(def mode-opts-printable (str "--" (join ", --" (sort (map name mode-opts)))))
 
 (defn- usage-message [summary & specific-messages]
-  (str "Usage: ght list repos OPTIONS\n\nOptions:\n"
+  (str "Usage: ghot list repos OPTIONS\n\nOptions:\n"
        summary
        "\n\n"
        (if specific-messages
          (join " " specific-messages)
-         (str "NB: the options " meo-printable " are mutually exclusive."))
+         (str "NB: the options " mode-opts-printable " are mutually exclusive."))
        "\n\n"
        "Full documentation is at https://github.com/FundingCircle/ght/"))
 
-(def exit-on-exit? "Set to false for testing." (atom true))
+;; Set to false for testing.
+(defonce exit-on-exit? (atom true))
 
 (defn exit
   [code & msgs]
@@ -54,7 +63,7 @@
 
 (defn- check-cli-opts
   [{:keys [summary errors]
-    {:keys [help]} :options :as opts}]
+    {:keys [help org token]} :options :as opts}]
   (cond
     help
     (exit 0 (usage-message summary))
@@ -62,11 +71,20 @@
     errors
     (exit 1 (usage-message summary "Errors:\n  " (join "\n  " errors)))
 
-    (> 1 (->> (select-keys opts mutually-exclusive-opts)
-              (vals)
-              (remove not)
-              (count)))
-    (exit 1 (usage-message summary "Error: the options" meo-printable "are mutually exclusive."))))
+    (or (nil? org) (blank? org))
+    (exit 1 (usage-message summary "Error: --org is required"))
+
+    (or (nil? token) (blank? token))
+    (exit 1 (usage-message summary "Error: --token is required"))
+
+    (not= 1 (->> (select-keys opts mode-opts)
+                 (vals)
+                 (remove not)
+                 ; (println)
+                 (count)))
+    (exit 1 (usage-message summary "Error: one and only one of the mode options"
+                                   (str "(" mode-opts-printable ")")
+                                   "must be specified."))))
 
 ; (defn warn
 ;   [& strs]
@@ -84,8 +102,9 @@
     :default      org-repos))
 
 (defn- api-opts
-  [cli-opts]
-  {:type (or (ffirst (filter second
+  [{:keys [token] :as cli-opts}]
+  {:oauth-token token
+   :type (or (ffirst (filter second
                       (select-keys cli-opts [:private :public :forks :sources])))
              :all)
    :all-pages true})
@@ -101,7 +120,9 @@
 
 (defn -main
   [& args]
-  (let [{{:keys [org format] :as cli-opts} :options :as parsed} (parse-opts args cli-opts-spec)
+  (let [{{:keys [org format debug] :as cli-opts} :options :as parsed} (parse-opts args cli-opts-spec :in-order true)
+        _ (when debug
+            (pprint parsed))
         _ (check-cli-opts parsed) ; exits or throws if there’s a problem
         get-repos (repos-fn cli-opts)]
     ;; TODO: try to ensure the result is lazy so the output will “stream”

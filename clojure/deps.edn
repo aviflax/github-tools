@@ -1,5 +1,9 @@
 {:deps
  {org.clojure/clojure         {:mvn/version "1.10.1"}
-  ; org.clojure/spec.alpha      {:mvn/version "0.2.176"}
+  org.clojure/spec.alpha      {:mvn/version "0.2.176"}
   irresponsible/tentacles     {:mvn/version "0.6.4"}
-  org.clojure/tools.cli       {:mvn/version "0.4.2"}}}
+
+  clojure.data.json           {:git/url "https://github.com/clojure/data.json"
+                               :sha "f1bf4e264749b51c64f4692da57eb89008758097"}
+  clojure.tools.cli           {:git/url "https://github.com/clojure/tools.cli"
+                               :sha "a65f8babd68cc43d6a657281dcc7214932ae4a0e"}}}
