@@ -81,17 +81,18 @@
 
 (defn- repos-fn
   "Returns a function with the same signature as tentacles.repos/org-repos: (fn [org & [options]])
-   wherein `org` is a String containing the org’s GitHub username."
+   wherein `org` is a String containing the org’s GitHub username. OR maybe just (fn [org options])."
   [{:keys [no-codeowners topic watching] :as _cli-opts}]
   (cond
-    watching      (fn [org & [options]] (org-repos-watching org :TO-USERNAME-DO options))
-    topic         (fn [org & [options]] (org-repos-for-topic org topic options))
-    no-codeowners (fn [org & [options]] (filter has-codeowners? (org-repos org options)))
+    watching      (fn [org options] (org-repos-watching org options))
+    topic         (fn [org options] (org-repos-for-topic org topic options))
+    no-codeowners (fn [org options] (remove has-codeowners? (org-repos org options)))
     :default      org-repos))
 
 (defn- cli-opts->api-opts
   [{:keys [token] :as cli-opts}]
   {:oauth-token token
+   :user-agent "https://github.com/FundingCircle/ghot"
    :type (or (ffirst (filter second
                       (select-keys cli-opts [:private :public :forks :sources])))
              :all)
@@ -111,16 +112,13 @@
   (let [{{:keys [org format debug] :as cli-opts} :options :as parsed}
         (parse-opts args cli-opts-spec :in-order true)
         _ (reset! verbose? (:verbose cli-opts))
-        _ (when debug
-            (pprint parsed))
+        _ (when debug (println "CLI args, parsed:") (pprint parsed))
         _ (check-cli-opts parsed) ; exits or throws if there’s a problem
-        _ (verbose "foo")
         f (repos-fn cli-opts)
         api-opts (cli-opts->api-opts cli-opts)
-        _ (verbose "foo")
         _ (verbose "About to call API with options:" api-opts)
         repos (f org api-opts)
-        _ (verbose "repos:" repos)
+        _ (when debug (println "API call result:") (pprint repos))
         ]
     ;; TODO: try to ensure the result is lazy so the output will “stream”
     (print-list repos org format)))
