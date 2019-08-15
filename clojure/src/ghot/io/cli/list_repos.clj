@@ -87,25 +87,24 @@
     watching      (fn [org options] (org-repos-watching org options))
     topic         (fn [org options] (org-repos-for-topic org topic options))
     no-codeowners (fn [org options] (remove has-codeowners? (org-repos org options)))
-    :default      org-repos))
+    :else         org-repos))
 
 (defn- cli-opts->api-opts
   [{:keys [token] :as cli-opts}]
   {:oauth-token token
    :user-agent "https://github.com/FundingCircle/ghot"
    :type (or (ffirst (filter second
-                      (select-keys cli-opts [:private :public :forks :sources])))
+                             (select-keys cli-opts [:private :public :forks :sources])))
              :all)
    :all-pages true})
 
 (defn- print-list
   "Hopefully the repos coll is lazy so this streams."
   [repos org format]
-  (case format
-    :names-only
-    (run! #(println (printable-name % org)) repos)
-    :json-stream
-    (run! #(println (json/write-str %)) repos)))
+  (run! (case format
+          :names-only  #(println (printable-name % org))
+          :json-stream #(println (json/write-str %)))
+        repos))
 
 (defn -main
   [& args]
@@ -118,7 +117,6 @@
         api-opts (cli-opts->api-opts cli-opts)
         _ (verbose "About to call API with options:" api-opts)
         repos (f org api-opts)
-        _ (when debug (println "API call result:") (pprint repos))
-        ]
+        _ (when debug (println "API call result:") (pprint repos))]
     ;; TODO: try to ensure the result is lazy so the output will “stream”
     (print-list repos org format)))
