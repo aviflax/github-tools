@@ -5,7 +5,8 @@
             [clojure.pprint :refer [pprint]]
             [clojure.string :refer [blank? join]]
             [clojure.tools.cli :refer [parse-opts]]
-            [ghot.io.cli.util :refer [exit verbose? verbose]]
+            [ghot.io.cli.util :refer [exit]]
+            [ghot.io.util :refer [verbose? verbose]]
             [ghot.io.repos :refer [has-codeowners? org-repos-watching org-repos-for-topic]]
             [ghot.repos :refer [printable-name]]
             [tentacles.repos :refer [org-repos]]))
@@ -93,10 +94,11 @@
   [{:keys [token] :as cli-opts}]
   {:oauth-token token
    :user-agent "https://github.com/FundingCircle/ghot"
+   :throw-exceptions true
+   :all-pages true
    :type (or (ffirst (filter second
                              (select-keys cli-opts [:private :public :forks :sources])))
-             :all)
-   :all-pages true})
+             :all)})
 
 (defn- print-list
   "Hopefully the repos coll is lazy so this streams."
@@ -116,7 +118,12 @@
         f (repos-fn cli-opts)
         api-opts (cli-opts->api-opts cli-opts)
         _ (verbose "About to call API with options:" api-opts)
-        repos (f org api-opts)
+        repos (try (f org api-opts)
+                   (catch Exception e
+                     (exit 1 "Error calling GitHub API:"
+                             (if-let [status (get-in (ex-data e) [:headers "Status"])]
+                               (str status "\n" (:body (ex-data e)))
+                               e))))
         _ (when debug (println "API call result:") (pprint repos))]
     ;; TODO: try to ensure the result is lazy so the output will “stream”
     (print-list repos org format)))

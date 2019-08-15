@@ -1,6 +1,7 @@
 (ns ghot.io.repos
   "Functions that supplement those in tentacles.repos."
   (:require [ghot.repos :refer [owned-by? owner-name]]
+            [ghot.io.util :refer [verbose]]
             ; [tentacles.core :refer [api-call]]
             [tentacles.repos :as tr]
             [tentacles.users :as tu]
@@ -15,9 +16,13 @@
   "Returns a (possibly empty) sequential collection of maps that represent repositories owned by the
   org to which the user is subscribed (watching), or throws."
   [org-name options]
-  (let [me (tu/me options)] ;; TODO: what if this fails?
-    (filter (fn [repo] (owned-by? repo org-name))
-            (tr/watching (:login me) options))))
+  (let [me (tu/me options)
+        _ (verbose "Retrieved user:" me)
+        response (tr/watching (:login me) options)
+        _ (if (sequential? response)
+              (verbose "Retrieved" (count response) "repos; first:" (first response))
+              (verbose "Error occured retrieving repos:" response))]
+    (filter #(owned-by? % org-name) response)))
 
 (defn has-codeowners?
   ;; TODO doesn’t this need authentication?

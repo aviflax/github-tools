@@ -6,4 +6,6 @@
   clojure.data.json           {:git/url "https://github.com/clojure/data.json"
                                :sha "f1bf4e264749b51c64f4692da57eb89008758097"}
   clojure.tools.cli           {:git/url "https://github.com/clojure/tools.cli"
-                               :sha "a65f8babd68cc43d6a657281dcc7214932ae4a0e"}}}
+                               :sha "a65f8babd68cc43d6a657281dcc7214932ae4a0e"}}
+ :aliases
+ {:ghot    {:main-opts ["-m" "ghot.io.cli.main"]}}}
