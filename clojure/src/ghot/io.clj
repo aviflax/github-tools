@@ -1,4 +1,4 @@
-(ns ghot.io.util)
+(ns ghot.io)
 
 ;; May be changed during development or testing, or via a CLI flag.
 (defonce verbose? (atom false))

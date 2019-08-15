@@ -1,4 +1,4 @@
-(ns ghot.io.cli.util)
+(ns ghot.io.cli)
 
 ;; Set to false for development or testing.
 (defonce exit-on-exit? (atom true))

@@ -2,7 +2,7 @@
   "The main CLI command."
   (:gen-class)
   (:require [ghot.io.cli.list-repos :as lr]
-            [ghot.io.cli.util :refer [exit]]))
+            [ghot.io.cli :refer [exit]]))
 
 (defn -main
   [& args]

@@ -5,8 +5,8 @@
             [clojure.pprint :refer [pprint]]
             [clojure.string :refer [blank? join]]
             [clojure.tools.cli :refer [parse-opts]]
-            [ghot.io.cli.util :refer [exit]]
-            [ghot.io.util :refer [verbose? verbose]]
+            [ghot.io :refer [verbose? verbose]]
+            [ghot.io.cli :refer [exit]]
             [ghot.io.repos :refer [has-codeowners? org-repos-watching org-repos-for-topic]]
             [ghot.repos :refer [printable-name]]
             [tentacles.repos :refer [org-repos]]))

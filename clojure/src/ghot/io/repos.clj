@@ -1,7 +1,7 @@
 (ns ghot.io.repos
   "Functions that supplement those in tentacles.repos."
   (:require [ghot.repos :refer [owned-by? owner-name]]
-            [ghot.io.util :refer [verbose]]
+            [ghot.io :refer [verbose]]
             ; [tentacles.core :refer [api-call]]
             [tentacles.repos :as tr]
             [tentacles.users :as tu]
