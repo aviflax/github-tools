@@ -20,6 +20,7 @@
             (tr/watching (:login me) options))))
 
 (defn has-codeowners?
+  ;; TODO doesn’t this need authentication?
   [{repo-name :name :as repo}]
   (boolean (tr/contents (owner-name repo) repo-name ".github/CODEOWNERS" {:str? true})))
 
@@ -29,7 +30,9 @@
 ;   ;; tentacles does not currently have DSL-level support for commit search. This is probably because
 ;   ;; the feature (of GitHub’s v3 API) is in beta (CONFIRM AND ADD LINK).
 ;   ;; TODO: the below is incorrect. Correct it!
+;   ;; See https://developer.github.com/v3/search/#search-commits
 ;   (let [query (format "repo:%s merge:false" repo-full-name)]
-;     (api-call :get "search" [] query {:sort :author-date
-;                                       :order :asc
-;                                       :per_page 1})))
+;     (api-call :get "search/commits" [] query {:sort :author-date
+;                                               :order :asc
+;                                               :Accept "application/vnd.github.cloak-preview"
+;                                               :per_page 1})))
