@@ -1,5 +1,5 @@
-repos
-all_repos
-*_repos
-repos_*
+/repos
+/all_repos
+/*_repos
+/repos_*
 *.bak

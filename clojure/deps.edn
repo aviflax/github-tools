@@ -8,4 +8,9 @@
   clojure.tools.cli           {:git/url "https://github.com/clojure/tools.cli"
                                :sha "a65f8babd68cc43d6a657281dcc7214932ae4a0e"}}
  :aliases
- {:ghot    {:main-opts ["-m" "ghot.io.cli.main"]}}}
+ {:test    {:extra-deps {lambdaisland/kaocha {:git/url "https://github.com/lambdaisland/kaocha"
+                                              :sha "49eacd2d68846108f11114131a04d688ba7ba492"}}}
+
+  ; This’d be clearer were it named `main` but I like it like this because when invoked in the shell
+  ; it looks more like using the compiled/packaged tool.
+  :ghot    {:main-opts ["-m" "ghot.io.cli.main"]}}}
