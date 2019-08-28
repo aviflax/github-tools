@@ -1,6 +1,6 @@
 (ns ghot.io.repos
   "Functions that supplement those in tentacles.repos."
-  (:require [ghot.repos :refer [owned-by? owner-name]]
+  (:require [ghot.repos :refer [owned-by? owner-username]]
             [ghot.io :refer [verbose]]
             ; [tentacles.core :refer [api-call]]
             [tentacles.repos :as tr]
@@ -27,7 +27,7 @@
 (defn has-codeowners?
   ;; TODO doesn’t this need authentication?
   [{repo-name :name :as repo}]
-  (boolean (tr/contents (owner-name repo) repo-name ".github/CODEOWNERS" {:str? true})))
+  (boolean (tr/contents (owner-username repo) repo-name ".github/CODEOWNERS" {:str? true})))
 
 ;; WIP WIP WIP
 ; (defn- first-commit
