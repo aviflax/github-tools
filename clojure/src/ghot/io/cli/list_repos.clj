@@ -30,7 +30,7 @@
    [nil "--no-codeowners" "List only repos owned by the org that do not have a CODEOWNERS file."]
 
    ;; Optional options.
-   [nil "--format FORMAT" "Specifies the output format."
+   [nil "--format FORMAT" "Specifies the output format: 'names-only' or 'json-stream'."
     :default :names-only
     :parse-fn keyword
     :validate [#{:names-only :json-stream} "Supported values are 'names-only' and 'json-stream'."]]
@@ -125,5 +125,6 @@
                                (str status "\n" (:body (ex-data e)))
                                e))))
         _ (when debug (println "API call result:") (pprint repos))]
-    ;; TODO: try to ensure the result is lazy so the output will “stream”
+    ;; The result of most calls using tentacles does seem to be a lazy coll, so that’s good; the
+    ;; results will print as they’re received.
     (print-list repos org format)))
